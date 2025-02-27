@@ -1,6 +1,10 @@
 import numpy as np          # To handle vector / matrix operations 
 
 # ------------------- Functions / Methods to initialise weights for Neural Networks -------------------
+#   Author: Nandhakishore C S 
+#   Roll Number: DA24M011
+#   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
+# --------------------------------------------------------------------------
 
 # Reference: https://www.deeplearning.ai/ai-notes/initialization/index.html
 class Random: 

@@ -1,5 +1,9 @@
 import numpy as np          # To handle vector / matrix operations 
 # ------------------- Label Encoder - assign number to string labels ----------------------------
+#   Author: Nandhakishore C S 
+#   Roll Number: DA24M011
+#   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
+# --------------------------------------------------------------------------
 
 class LabelEncoder:
     __slots__ = '_label_to_num', '_num_to_label', '_classes_'

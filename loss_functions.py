@@ -1,6 +1,10 @@
 import numpy as np          # To handle vector / matrix operations 
 
 # ------------------- Loss Functions for Neural Networks -------------------
+#   Author: Nandhakishore C S 
+#   Roll Number: DA24M011
+#   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
+# --------------------------------------------------------------------------
 
 # Used for classification
 class CategoricalCrossEntropy():
