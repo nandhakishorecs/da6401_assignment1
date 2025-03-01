@@ -1,3 +1,14 @@
+# Python cache - cython files (.pyc)
 __pycache__/
+
+# wandb configuration files and offline logs 
+wandb/
+
+# Virtual environment local files (.pyc) + Local files on packages 
 assignment1/
+
+# Mac's window size + application icon size checker 
 .DS_Store/
+
+# local tested files to check for images in questions 1 to 7
+test_image.png
