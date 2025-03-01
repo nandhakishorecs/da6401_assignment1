@@ -30,3 +30,19 @@ class LabelEncoder:
 
     def inverse_transform(self, labels:np.ndarray) -> np.ndarray:
         return np.array([self._num_to_label[idx] for idx in labels])    
+    
+class MinMaxScaler: 
+    __slots__ = '_array', '_min', '_max'
+    def __init__(self, X:np.ndarray) -> None:
+        self._array = X 
+
+    def fit(self): 
+        self._min = np.min(self._array, axis = 0)
+        self._max = np.max(self._array, axis = 0)
+
+    def transform(self): 
+        return (self._array - self._min) / (self._max - self._min)
+
+    def fit_transform(self): 
+        self.fit()
+        return self.fit_transform()
