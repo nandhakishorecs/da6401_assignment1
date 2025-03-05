@@ -30,11 +30,11 @@ class Input:
 
 # Hidden Layers 
 class Dense: 
-    __slots__ = '_size', '_activation_func', '_activation_func_name', '_name'
+    __slots__ = '_size', '_activation', '_activation_func_name', '_name'
     def __init__(self, size:int, activation: str, name: str, isLastLayer:bool = False) -> None:
         self._name = name 
         self._size = size 
-        self._activation_func = activation_functions_map[activation]
+        self._activation = activation_functions_map[activation]
         self._activation_func_name = activation
 
     def __repr__(self) -> str: 

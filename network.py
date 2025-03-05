@@ -3,6 +3,7 @@ import numpy as np
 import wandb
 from tqdm import tqdm 
 from copy import deepcopy
+import tensorflow as tf
 
 from initialisers import * 
 from activations import * 
@@ -17,6 +18,18 @@ from metrics import *
 #   Roll Number: DA24M011
 #   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
 # --------------------------------------------------------------------------
+
+# optimiser map 
+map_optimiser = {
+    'Vannial_GD' : VannilaGradientDescent(),
+    'Momentum_GD' : MomentumGradientDescent() 
+}
+
+# loss function map 
+map_loss_function = {
+    'Categorical_Cross_Entropy' : CategoricalCrossEntropy(), 
+    'Mean_Squared_Error' : MeanSquaredError()
+}
 
 # Basic skeleton - yet to be implemented
 class NeuralNetwork: 
@@ -41,7 +54,7 @@ class NeuralNetwork:
             self._y_val = validation_target
             self.layers[0]._a = validation_features
         self._X_val = validation_features
-        # self._loss_function = loss_functions_map[loss_function]
+        self._loss_function = map_loss_function[loss_function]
         self._loss_type = loss_function
         self._n_epochs = n_epochs
         self._optimised_parameters = optimised_parameters
@@ -58,9 +71,29 @@ class NeuralNetwork:
             if(self._optimiser is not None): 
                 layer.W_optimiser._set_parameters(self._optimised_parameters)
                 layer.b_optimiser._set_parameters(self._optimised_parameters)
+        
+        if(self._init == 'Random_normal'):
+            for layer in self._layers[1: ]: 
+                layer._W = np.random.normal(loc = 0, scale = 1.0, size = layer._W_size)
+                layer._b = np.zeros((layer._W_size[0], 1))
+        elif(self._init == 'Xavier'): 
+            for layer in self._layers[1: ]: 
+                initialiser = tf.keras.initializers.RandomNormal(mean = 0.0, stddev = 0.05)
+                layer._W = np.array(initialiser(shape = layer._W_size))
+                layer._b = np.array((layer._W_size[0], 1))
+        elif(self._init == 'Zero'): 
+            for layer in self._layers[1: ]: 
+                layer._W = np.ones(layer._W_size) * 0.05
+                layer._b = np.zeros((layer._W_size[0], 1))
+    
+    def _forward_propagation(self): 
+        for i in range(1, len(self._layers)): 
+            # in first layer, no activation, in hidden layers, pre-activation
+            self._layers[i]._h = self._layers[i]._W @ self._layers[i-1]._a - self._layers[i]._b
+            # applying activation function (relu, tanh, sigmoid) 
+            self._layers[i]._a = self._layers[i]._activation._value(self._layers[i]._h)
+            # incomplete
         pass
-    
-    
     # Python special function to describe the neural network with given configuration
     def __str__(self): 
         name = '\nNeural Network\n Configuration:\n'
