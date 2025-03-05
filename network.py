@@ -31,8 +31,12 @@ map_loss_function = {
     'Mean_Squared_Error' : MeanSquaredError()
 }
 
+# Encoder 
+encoder = LabelEncoder()
+
 # Basic skeleton - yet to be implemented
 class NeuralNetwork: 
+    # ---------------- Class initialisation ----------------
     __slots__ = '_layers', '_batch_size', '_optimiser', '_target', '_init', '_n_epochs', '_validation', '_X_val', '_y_val', '_log', '_loss_type', '_loss_function', '_a', '_optimised_parameters'
     def __init__(
             self, layers: list, batch_size: int, optimiser: str, initilaisation: str, n_epochs: int, 
@@ -60,7 +64,21 @@ class NeuralNetwork:
         self._optimised_parameters = optimised_parameters
         self._init_parameters()
 
-    # initialising parameters
+    # ---------------- Class representation ----------------
+    # Python special function to describe the neural network with given configuration
+    def __str__(self): 
+        name = '\nNeural Network\n Configuration:\n'
+        for layer in self._layers: 
+            temp = str(layer) + ' '
+        temp += '\n'
+        epochs = f'Epochs:\t{self._n_epochs}\n'
+        loss = f'Loss function:\t{self._loss_function}\n'
+        batch_size = f'Batch size:\t{self._batch_size}\n'
+        optimiser = f'Optimiser:\t{self._optimiser}\n'
+        init = f'Initialisation type:\t{self._init}\n'
+        return name + temp + epochs + loss + batch_size + optimiser + init
+
+    # ---------------- Parameter initialisation for different layers ----------------
     def _init_parameters(self):
         previous_layer_size = self._layers[0].size
         for layer in self._layers[1: ]:
@@ -69,8 +87,8 @@ class NeuralNetwork:
             layer.W_optimiser = deepcopy(self._loss_function)
             layer.b_optimiser = deepcopy(self._loss_function)
             if(self._optimiser is not None): 
-                layer.W_optimiser._set_parameters(self._optimised_parameters)
-                layer.b_optimiser._set_parameters(self._optimised_parameters)
+                layer._W_optimiser._set_parameters(self._optimised_parameters)
+                layer._b_optimiser._set_parameters(self._optimised_parameters)
         
         if(self._init == 'Random_normal'):
             for layer in self._layers[1: ]: 
@@ -86,23 +104,118 @@ class NeuralNetwork:
                 layer._W = np.ones(layer._W_size) * 0.05
                 layer._b = np.zeros((layer._W_size[0], 1))
     
-    def _forward_propagation(self): 
+    # ---------------- Forward Propagation ----------------
+    def _forward_propagation(self) -> None: 
         for i in range(1, len(self._layers)): 
             # in first layer, no activation, in hidden layers, pre-activation
             self._layers[i]._h = self._layers[i]._W @ self._layers[i-1]._a - self._layers[i]._b
             # applying activation function (relu, tanh, sigmoid) 
             self._layers[i]._a = self._layers[i]._activation._value(self._layers[i]._h)
-            # incomplete
-        pass
-    # Python special function to describe the neural network with given configuration
-    def __str__(self): 
-        name = '\nNeural Network\n Configuration:\n'
-        for layer in self._layers: 
-            temp = str(layer) + ' '
-        temp += '\n'
-        epochs = f'Epochs:\t{self._n_epochs}\n'
-        loss = f'Loss function:\t{self._loss_function}\n'
-        batch_size = f'Batch size:\t{self._batch_size}\n'
-        optimiser = f'Optimiser:\t{self._optimiser}\n'
-        init = f'Initialisation type:\t{self._init}\n'
-        return name + temp + epochs + loss + batch_size + optimiser + init
+            # validation 
+            self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
+            self._layers[i]._a_val = self._layers[i]._activation._value(self._layers[i]._h_val)
+        
+        if(self._loss_type == 'Categorical_Cross_Entropy'): 
+            # Final layer has softmax, others have a different activation function
+            self._layers[-1]._y = softmax()._value(self._layers[-1]._a)
+            self._layers[-1]._y_val = softmax()._value(self._layers[-1]._a_val)
+        else: 
+            # getting values from the activation layer of the previous layer as the input to the current layer
+            self._layers[-1]._y = self._layers[-1]._a
+            self._layers[-1]._y_val = self._layers[-1]._a_val
+
+    # ---------------- Backward Propagation ----------------
+    def _backward_propagation(self, validation: bool = False, verbose: bool = False) -> None: 
+        # Flag variable to stop when converged
+        flag = False
+        
+        # For Wandb
+        lr_log = []
+        training_loss_log = []
+        training_accuracy_log = []
+        validation_loss_log = []
+        validation_accuracy_log = [] 
+
+        for epoch in tqdm(range(self._n_epochs)):
+            # accuracy calculation - START
+            train_target = encoder.inverse_transform(self._target)
+            train_y = encoder.inverse_transform(self._layers[-1]._y)
+            training_accuracy = Metrics().accuracy_score(train_target, train_y)
+            if(verbose is True):
+                print(f'Training accuracy: {training_accuracy}')
+            if(validation is True): 
+                validation_target = encoder.inverse_transform(self._y_val)
+                validation_y = encoder.inverse_transform(self._layers[-1]._y_val)
+                validation_accuracy = Metrics().accuracy_score(validation_target, validation_y)
+                if(verbose is True):
+                    print(f'Validation accuracy: {validation_accuracy}')
+            # accuracy calculation - END
+
+            # Logging - START
+            lr_log.append(self._layers[-1]._W_optimiser._eta)
+            training_loss_log.append(self._loss_function._loss(self._target, self._layers[-1]._y))
+            validation_loss_log.append(self._loss_function._loss(self._y_val, self._X_val))
+            training_loss_log.append(training_accuracy)
+            training_accuracy_log.append(training_accuracy)
+            validation_accuracy_log.append(validation_accuracy)
+            # Logging - END
+
+            # Wandb logging
+            if(self._log is True): 
+                wandb.log({
+                    'Epoch:': epoch, \
+                    'Training Loss:': training_loss_log[-1]/self._target.shape[1], \
+                    'Validation Loss': validation_loss_log[-1]/self._y_val.shape[1], \
+                    'Training Accuracy:': training_accuracy[-1]/self._target.shape[1], \
+                    'Validation Accuracy:': validation_accuracy_log[-1]/self._y_val.shape[1]
+                })
+
+            for batch in range(self._batch_size): 
+                target_batch = self._target[:, batch  * self._batch_size:(batch + 1) * self._batch_size]
+                y_batch = self._layers[-1]._y[:, batch * self._batch_size:(batch + 1) * self._batch_size]
+
+                try:
+                    if(training_loss_log[-1] > training_loss_log[-2]):
+                        for layer in self._layers[1:]: 
+                            layer._W_optimiser._set_parameters({'eta': self._optimiser._lr/2})
+                            layer._b_optimiser._set_parameters({'eta': self._optimiser._lr/2})
+                            flag = True
+                except: 
+                    pass
+
+                if(flag):
+                    break
+
+                self._layers[-1]._a_grad = self._loss_function._derivative(target_batch, y_batch)
+                self._layers[-1]._h_grad = self._layers[-1]._a_grad * self._layers[-1]._activation._derivative(self._layers[-1]._h[: batch * self._batch_size:(batch+1) * self._batch_size])
+
+                self._layers[-1]._W_grad = self._layers[-1]._h_grad @ self._layers[-2]._a[:, batch * self._batch_size : (batch + 1) * self._batch_size].T
+                self._layers[-1]._W_update = self._layers[-1]._W_optimiser._update_parameters(self._layers[-1]._W_grad)
+
+                self._layers[-1]._b_grad = (-1)*np.sum(self._layers[-1]._h_grad, axis = 1).reshape(-1, 1)
+                self._layers[-1]._b_update = self._layers[-1]._b_optimiser._update_parameters(self._layers[-1]._b_grad)
+
+                assert self._layers[-1]._W_update.shape == self._layers[-1]._W.shape, 'Size mismatch in hidden layers'
+
+                # do backpropagation in remianing layers
+                for i in range(len(self._layers[: -2]), 0, -1): 
+                    self._layers[i]._a_grad = self._layers[i+1]._W.T @ self._layers[i+1]._h_grad
+                    self._layers[i]._h_grad = self._layers[i]._a_grad * self._layers[i]._activation._derivative(self._layers[i]._h[:, batch * self._batch_size: (batch+1)* self._batch_size])
+                    
+                    self._layers[i]._b_grad = (-1) * np.sum(self._layers[i]._h_grad, axis = 1).reshape(-1, 1)
+                    self._layers[i]._W_grad = self._layers[i]._h_grad @ self._layers[i-1]._a[:, batch * self._batch_size: (batch + 1) * self._batch_size].T
+
+                    self._layers[i]._W_update = self._layers[i]._W_optimiser._update_parameters(self._layers[i]._W_grad)
+                    self._layers[i]._b_update = self._layers[i]._b_optimiser._update_parameters(self._layers[i]._b_grad)
+                    pass
+                
+
+                # update weight
+                for _, layer in enumerate(self._layers[1:]):
+                    layer._W = layer._W - layer._W_update
+                    layer._b = layer._b - layer._b_update
+
+                self._forward_propagation()
+
+            if(flag): 
+                break

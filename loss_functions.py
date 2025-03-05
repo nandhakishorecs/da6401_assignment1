@@ -13,12 +13,12 @@ class CategoricalCrossEntropy():
         self._true = y 
         self._predicted = y_pred
 
-    def loss(self) -> float: 
+    def _loss(self) -> float: 
         return (-1) * np.sum(
             np.sum(self._true * np.log(self._predicted))
         )
 
-    def derivative(self) -> np.ndarray: 
+    def _derivative(self) -> np.ndarray: 
         return (-1) * (self._true / (self._predicted))
 
 # Used for regression
@@ -28,10 +28,10 @@ class MeanSquaredError():
         self._true = y 
         self._predicted = y_pred
 
-    def loss(self) -> float:
+    def _loss(self) -> float:
         return np.sum((self._true - self._predicted)**2)
 
-    def derivative(self, true_batch, predicted_batch) -> np.ndarray: 
+    def _derivative(self, true_batch, predicted_batch) -> np.ndarray: 
         self._t_batch = true_batch
         self._predicted_batch = predicted_batch
         return (-1) * (self._t_batch - self._predicted_batch)
