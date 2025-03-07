@@ -1,5 +1,6 @@
 import numpy as np                  # for vector / matrix operations
 from activations import *           # functions sigmoid, tanh, relu, softmax 
+from initialisers import *          # Random Normal, Xavier 
 
 # ------------------- Layers for Neural Networks -------------------
 #   Author: Nandhakishore C S 
@@ -8,34 +9,37 @@ from activations import *           # functions sigmoid, tanh, relu, softmax
 # --------------------------------------------------------------------------
 
 activation_functions_map = {
-    'Sigmoid': sigmoid(), 
-    'Tanh': tanh(), 
-    'ReLU': relu(), 
-    'Softmax': softmax()
+    'Sigmoid': Sigmoid(), 
+    'Tanh': Tanh(), 
+    'ReLU': ReLU(),
+    'Softmax': Softmax()
+}
+
+initialiser_map = {
+    'Random_Normal': RandomInit(), 
+    'Xavier': XavierInit()
 }
 
 # We have K layers - Kth layer is output, 1st layer is Input and we have L-1 Hidden layers 
 # Input Layer 
-class Input: 
-    # __slots__ = '_name', '_input', '_size', '_a'
-    def __init__(self, X:np.ndarray) -> None:
-        self._name = 'Input',
-        self._input = X, 
-        self._size = X.shape[0]
-        self._activation_val = self._input                # activated value
+class InputLayer:
+    __slots__ = ['_input_data']
+    
+    def __init__(self, input_data) -> None:
+        self._input_data = np.array(input_data)
+    
+    def __repr__(self) -> str:
+        return "InputLayer"
 
-    # python special function to give a string representavle name to the class
-    def __repr__(self) -> str: 
-        return  self.__class__.__name__ + 'of size:' + str(self._size)
-
-# Hidden Layers 
-class Dense: 
-    # __slots__ = '_size', '_activation', '_activation_func_name', '_name'
-    def __init__(self, size:int, activation: str, name: str, isLastLayer:bool = False) -> None:
-        self._name = name 
-        self._size = size 
+class Dense:
+    __slots__ = ['_weights', '_biases', '_activation', '_input_data', '_output_data']
+    
+    def __init__(self, input_size: int, output_size: int, activation: str, initializer) -> None:
+        self._weights = initializer.initialize(input_size, output_size)
+        self._biases = np.zeros((1, output_size))
         self._activation = activation_functions_map[activation]
-        self._activation_func_name = activation
-
-    def __repr__(self) -> str: 
-        return self.__class__.__name__ + 'of size:' + str(self._size) + '|' + self._activation_func_name + 'activation'
+        self._input_data = None
+        self._output_data = None
+    
+    def __repr__(self) -> str:
+        return "Dense"
