@@ -17,12 +17,12 @@ activation_functions_map = {
 # We have K layers - Kth layer is output, 1st layer is Input and we have L-1 Hidden layers 
 # Input Layer 
 class Input: 
-    __slots__ = '_name', '_input', '_size', '_a'
+    # __slots__ = '_name', '_input', '_size', '_a'
     def __init__(self, X:np.ndarray) -> None:
         self._name = 'Input',
         self._input = X, 
-        self._size = self._input.shape[0]
-        self._a = self._input                       # variable purpose unknown
+        self._size = X.shape[0]
+        self._activation_val = self._input                # activated value
 
     # python special function to give a string representavle name to the class
     def __repr__(self) -> str: 
@@ -30,7 +30,7 @@ class Input:
 
 # Hidden Layers 
 class Dense: 
-    __slots__ = '_size', '_activation', '_activation_func_name', '_name'
+    # __slots__ = '_size', '_activation', '_activation_func_name', '_name'
     def __init__(self, size:int, activation: str, name: str, isLastLayer:bool = False) -> None:
         self._name = name 
         self._size = size 

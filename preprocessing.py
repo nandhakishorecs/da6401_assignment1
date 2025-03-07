@@ -32,17 +32,18 @@ class LabelEncoder:
         return np.array([self._num_to_label[idx] for idx in labels])    
     
 class MinMaxScaler: 
-    __slots__ = '_array', '_min', '_max'
-    def __init__(self, X:np.ndarray) -> None:
-        self._array = X 
+    __slots__ = '_min', '_max'
+    def __init__(self) -> None:
+        self._min = 0 
+        self._max = 0
 
-    def fit(self): 
-        self._min = np.min(self._array, axis = 0)
-        self._max = np.max(self._array, axis = 0)
+    def fit(self, array: np.ndarray) -> None: 
+        self._min = np.min(array, axis = 0)
+        self._max = np.max(array, axis = 0)
 
-    def transform(self): 
-        return (self._array - self._min) / (self._max - self._min)
+    def transform(self, array: np.ndarray) -> np.ndarray: 
+        return (array - self._min) / (self._max - self._min)
 
-    def fit_transform(self): 
-        self.fit()
-        return self.fit_transform()
+    def fit_transform(self, array: np.ndarray) -> np.ndarray: 
+        self.fit(array)
+        return self.fit_transform(array)

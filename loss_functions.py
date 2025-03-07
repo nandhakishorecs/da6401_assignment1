@@ -8,30 +8,24 @@ import numpy as np          # To handle vector / matrix operations
 
 # Used for classification
 class CategoricalCrossEntropy():
-    __slots__ = '_true', '_predicted'
-    def __init__(self, y: np.ndarray, y_pred: np.ndarray) -> None:
-        self._true = y 
-        self._predicted = y_pred
+    def __init__(self) -> None:
+        pass
 
-    def _loss(self) -> float: 
+    def _loss(self, true: np.ndarray, predicted: np.ndarray) -> float: 
         return (-1) * np.sum(
-            np.sum(self._true * np.log(self._predicted))
+            np.sum(true * np.log(predicted))
         )
 
-    def _derivative(self) -> np.ndarray: 
-        return (-1) * (self._true / (self._predicted))
+    def _derivative(self, true: np.ndarray, predicted: np.ndarray) -> np.ndarray: 
+        return (-1) * (true / predicted)
 
 # Used for regression
 class MeanSquaredError(): 
-    __slots__ = '_true', '_predicted', '_t_batch', '_predicted_batch'
-    def __init__(self, y: np.ndarray, y_pred: np.ndarray) -> None:
-        self._true = y 
-        self._predicted = y_pred
+    def __init__(self) -> None:
+        pass
 
-    def _loss(self) -> float:
-        return np.sum((self._true - self._predicted)**2)
+    def _loss(self, true: np.ndarray, predicted: np.ndarray) -> float:
+        return np.sum((true - predicted)**2)
 
-    def _derivative(self, true_batch, predicted_batch) -> np.ndarray: 
-        self._t_batch = true_batch
-        self._predicted_batch = predicted_batch
-        return (-1) * (self._t_batch - self._predicted_batch)
+    def _derivative(self, true_batch, predicted_batch) : 
+        return (-1) * (true_batch - predicted_batch)

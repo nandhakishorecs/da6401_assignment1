@@ -37,31 +37,37 @@ encoder = LabelEncoder()
 # Basic skeleton - yet to be implemented
 class NeuralNetwork: 
     # ---------------- Class initialisation ----------------
-    __slots__ = '_layers', '_batch_size', '_optimiser', '_target', '_init', '_n_epochs', '_validation', '_X_val', '_y_val', '_log', '_loss_type', '_loss_function', '_a', '_optimised_parameters'
+    # __slots__ = '_layers', '_batch_size', '_optimiser', '_target', '_init', '_n_epochs', '_validation', '_X_val', '_y_val', '_log', '_loss_type', '_loss_function', '_a', '_optimised_parameters'
     def __init__(
             self, layers: list, batch_size: int, optimiser: str, initilaisation: str, n_epochs: int, 
             target: np.ndarray, 
             loss_function: str, 
+            wandb: bool = False, 
             validation: bool = True,
             validation_features: np.ndarray = None, 
             validation_target: np.ndarray = None, 
             # learning rate
             optimised_parameters: list = None
         ) -> None:
+
         self._layers = layers
         self._batch_size = batch_size
         self._init = initilaisation
         self._optimiser = optimiser
         self._target = target
+
+        self._validation = validation
         if(self._validation == validation): 
             self._X_val = validation_features
             self._y_val = validation_target
-            self.layers[0]._a = validation_features
+            self._layers[0]._a = validation_features
+
         self._X_val = validation_features
         self._loss_function = map_loss_function[loss_function]
         self._loss_type = loss_function
         self._n_epochs = n_epochs
         self._optimised_parameters = optimised_parameters
+        self._log = wandb
         self._init_parameters()
 
     # ---------------- Class representation ----------------
@@ -80,13 +86,13 @@ class NeuralNetwork:
 
     # ---------------- Parameter initialisation for different layers ----------------
     def _init_parameters(self):
-        previous_layer_size = self._layers[0].size
+        previous_layer_size = self._layers[0]._size
         for layer in self._layers[1: ]:
-            layer.W_size = (layer.size, previous_layer_size)
-            previous_layer_size = layer.size
-            layer.W_optimiser = deepcopy(self._loss_function)
-            layer.b_optimiser = deepcopy(self._loss_function)
-            if(self._optimiser is not None): 
+            layer._W_size = (layer._size, previous_layer_size)
+            previous_layer_size = layer._size
+            layer._W_optimiser = deepcopy(self._optimiser)
+            layer._b_optimiser = deepcopy(self._optimiser)
+            if(self._optimised_parameters is not None): 
                 layer._W_optimiser._set_parameters(self._optimised_parameters)
                 layer._b_optimiser._set_parameters(self._optimised_parameters)
         
@@ -110,19 +116,19 @@ class NeuralNetwork:
             # in first layer, no activation, in hidden layers, pre-activation
             self._layers[i]._h = self._layers[i]._W @ self._layers[i-1]._a - self._layers[i]._b
             # applying activation function (relu, tanh, sigmoid) 
-            self._layers[i]._a = self._layers[i]._activation._value(self._layers[i]._h)
+            self._layers[i]._a = self._layers[i]._activation.value(self._layers[i]._h)
             # validation 
-            self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
-            self._layers[i]._a_val = self._layers[i]._activation._value(self._layers[i]._h_val)
+            self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._activation_val - self._layers[i]._b
+            self._layers[i]._activation_val = self._layers[i]._activation.value(self._layers[i]._h_val)
         
         if(self._loss_type == 'Categorical_Cross_Entropy'): 
             # Final layer has softmax, others have a different activation function
-            self._layers[-1]._y = softmax()._value(self._layers[-1]._a)
-            self._layers[-1]._y_val = softmax()._value(self._layers[-1]._a_val)
+            self._layers[-1]._y = softmax().value(self._layers[-1]._a)
+            self._layers[-1]._y_val = softmax().value(self._layers[-1]._activation_val)
         else: 
             # getting values from the activation layer of the previous layer as the input to the current layer
             self._layers[-1]._y = self._layers[-1]._a
-            self._layers[-1]._y_val = self._layers[-1]._a_val
+            self._layers[-1]._y_val = self._layers[-1]._activation_val
 
     # ---------------- Backward Propagation ----------------
     def _backward_propagation(self, validation: bool = False, verbose: bool = False) -> None: 
@@ -136,16 +142,21 @@ class NeuralNetwork:
         validation_loss_log = []
         validation_accuracy_log = [] 
 
+        # needed debugging in verbose, wandb
         for epoch in tqdm(range(self._n_epochs)):
             # accuracy calculation - START
-            train_target = encoder.inverse_transform(self._target)
-            train_y = encoder.inverse_transform(self._layers[-1]._y)
+            # train_target = encoder.inverse_transform(self._target)
+            train_target = self._target
+            # train_y = encoder.inverse_transform(self._layers[-1]._y)
+            train_y = self._layers[-1]._y
             training_accuracy = Metrics().accuracy_score(train_target, train_y)
             if(verbose is True):
                 print(f'Training accuracy: {training_accuracy}')
             if(validation is True): 
-                validation_target = encoder.inverse_transform(self._y_val)
-                validation_y = encoder.inverse_transform(self._layers[-1]._y_val)
+                # validation_target = encoder.inverse_transform(self._y_val)
+                validation_target = self._y_val
+                # validation_y = encoder.inverse_transform(self._layers[-1]._y_val)
+                validation_y = self._layers[-1]._y_val
                 validation_accuracy = Metrics().accuracy_score(validation_target, validation_y)
                 if(verbose is True):
                     print(f'Validation accuracy: {validation_accuracy}')
