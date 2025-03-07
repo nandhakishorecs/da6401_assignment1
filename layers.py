@@ -22,7 +22,7 @@ initialiser_map = {
 
 # We have K layers - Kth layer is output, 1st layer is Input and we have L-1 Hidden layers 
 # Input Layer 
-class InputLayer:
+class Input:
     __slots__ = ['_input_data']
     
     def __init__(self, input_data) -> None:
