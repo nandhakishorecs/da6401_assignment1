@@ -31,6 +31,31 @@ class LabelEncoder:
     def inverse_transform(self, labels:np.ndarray) -> np.ndarray:
         return np.array([self._num_to_label[idx] for idx in labels])    
     
+class OneHotEncoder():
+    __slots__ = '_y', '_n_class'
+    def __init__(self) -> None:
+        self._y = None
+        self._n_class = 0
+    
+    def fit(self, y: np.ndarray, n_class: int ) -> None:
+        self._y = y 
+        self._n_class = n_class
+        return self
+
+    def transform(self) -> np.ndarray:
+        transformed = np.zeros((self._n_class, self._y.size))
+        for column, row in enumerate(self._y):
+            transformed[row, column] = 1
+        return transformed
+
+    def fit_transform(self, y: np.ndarray, n_class: int) -> np.ndarray:
+        self.fit(y, n_class)
+        return self.transform()
+
+    def inverse_transform(self, y: np.ndarray) -> np.ndarray:
+        # Assumes direct correation between the position and class number
+        return np.argmax(y, axis=0)
+
 class MinMaxScaler: 
     __slots__ = '_min', '_max'
     def __init__(self) -> None:

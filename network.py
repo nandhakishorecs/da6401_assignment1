@@ -32,9 +32,12 @@ map_loss_function = {
 }
 
 # Encoder 
-encoder = LabelEncoder()
+encoder = OneHotEncoder()
 
-# Basic skeleton - yet to be implemented
+# Classification metrics calculator 
+metrics = Metrics()
+
+# Basic skeleton - partially implemented
 class NeuralNetwork: 
     # ---------------- Class initialisation ----------------
     # __slots__ = '_layers', '_batch_size', '_optimiser', '_target', '_init', '_n_epochs', '_validation', '_X_val', '_y_val', '_log', '_loss_type', '_loss_function', '_a', '_optimised_parameters'
@@ -145,11 +148,10 @@ class NeuralNetwork:
         # needed debugging in verbose, wandb
         for epoch in tqdm(range(self._n_epochs)):
             # accuracy calculation - START
-            # train_target = encoder.inverse_transform(self._target)
-            train_target = self._target
-            # train_y = encoder.inverse_transform(self._layers[-1]._y)
-            train_y = self._layers[-1]._y
-            training_accuracy = Metrics().accuracy_score(train_target, train_y)
+            train_target = encoder.inverse_transform(self._target)
+            train_y = encoder.inverse_transform(self._layers[-1]._y)
+            
+            training_accuracy = metrics.accuracy_score(train_target, train_y)
             if(verbose is True):
                 print(f'Training accuracy: {training_accuracy}')
             if(validation is True): 

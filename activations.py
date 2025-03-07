@@ -7,62 +7,68 @@ import numpy as np          # To handle vector / matrix operations
 # --------------------------------------------------------------------------
 
 # used for any hidden layer in a neural network 
-class sigmoid: 
-    __slots__ = '_c', '_b'
-    def __init__(self, c:float = 1, b:float  = 0) -> None:
-        self._b = b
-        self._c = c
-
-    def value(self, X:np.ndarray) -> np.ndarray:
-        obj = 1 + np.exp((-1) * self._c(X + self._b))
-        return 1/obj
-
-    def _derivative(self, X:np.ndarray, remove:bool = False) -> np.ndarray: 
-        _value = self.value(X)
-        if(remove == True): 
-            _value = _value[: -1, :]
-        return self._c * _value * (1 - _value)
-
-# used for any hidden layer in a neural network 
-class tanh: 
-    def __init__(self) -> None:
-        pass
-
-    def value(self, X: np.ndarray) -> np.ndarray:
-        numerator = np.exp(X) - np.exp((-1) * X)
-        denominator = np.exp(X) + np.exp((-1) * X)
-        return numerator/denominator
-
-    def _derivative(self, X: np.ndarray) -> np.ndarray: 
-        y = self.value(X)
-        diff = 1 - (y**2)
-        return diff
-
-# used for any hidden layer in a neural network 
-class relu: 
-    def __init__(self) -> None:
-        pass
-
-    def value(self, X: np.ndarray) -> np.ndarray:
-        r = X 
-        r[r < 0] = 0 
-        return r
+class Sigmoid:
+    __slots__ = ['x']
     
-    def _derivative(self, X: np.ndarray) -> np.ndarray: 
-        diff = np.ones(X.shape)
-        diff[diff < 0] = 0
-        return diff
+    def __init__(self, x):
+        self.x = np.array(x)
+    
+    def value(self):
+        return 1 / (1 + np.exp(-self.x))
+    
+    def _derivative(self):
+        sigmoid_x = self.value()
+        return sigmoid_x * (1 - sigmoid_x)
+    
+    def __repr__(self):
+        return "Sigmoid"
 
-# used for final layer in a neural network 
-class softmax: 
-    def __init__(self) -> None:
-        pass
+# used for any hidden layer in a neural network 
+class Tanh:
+    __slots__ = ['x']
+    
+    def __init__(self, x):
+        self.x = np.array(x)
+    
+    def value(self):
+        return np.tanh(self.x)
+    
+    def _derivative(self):
+        return 1 - np.tanh(self.x) ** 2
+    
+    def __repr__(self):
+        return "Tanh"
+    
+# used for any hidden layer in a neural network 
+class ReLU:
+    __slots__ = ['x']
+    
+    def __init__(self, x):
+        self.x = np.array(x)
+    
+    def value(self):
+        return np.maximum(0, self.x)
+    
+    def _derivative(self):
+        return np.where(self.x > 0, 1, 0)
+    
+    def __repr__(self):
+        return "ReLU"
 
-    def value(self, X: np.ndarray) -> np.ndarray:
-        return np.exp(X)/np.sum(np.exp(X), axis = 0)
-
-    def _derivative(self, X: np.ndarray) -> np.ndarray: 
-        y = self.value(X)
-        matrix = np.title(y, y.shape[0])
-        diff = np.diag(y.reshape(-1, ) - (matrix * matrix.T))
-        return diff
+# used for the last layer in a neural network 
+class Softmax:
+    __slots__ = ['x']
+    
+    def __init__(self, x):
+        self.x = np.array(x)
+    
+    def value(self):
+        exp_x = np.exp(self.x - np.max(self.x))  # Prevent overflow
+        return exp_x / np.sum(exp_x)
+    
+    def _derivative(self):
+        softmax_x = self.value().reshape(-1, 1)
+        return np.diagflat(softmax_x) - np.dot(softmax_x, softmax_x.T)
+    
+    def __repr__(self):
+        return "Softmax"
