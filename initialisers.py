@@ -16,12 +16,12 @@ class RandomInit:
 # Reference: https://cs230.stanford.edu/section/4/#:~:text=The%20goal%20of%20Xavier%20Initialization,gradient%20from%20exploding%20or%20vanishing.
 class XavierInit:
     @staticmethod
-    def initialize(layer_size: int, mean: int = 0, std_dev: int = 0.05):
+    def initialize(layer_size: tuple, mean: int = 0, std_dev: int = 0.05):
         return  np.random.normal(loc = mean, scale = std_dev, size = layer_size) * np.sqrt(1 / layer_size[0])
         # return  np.random.randn(*layer_size) * np.sqrt(1 / layer_size[1])
 
 class HeInit:
     @staticmethod
-    def initialize(layer_size: int, mean: int = 0, std_dev: int = 0.05):
+    def initialize(layer_size: tuple, mean: int = 0, std_dev: int = 0.05):
         return  np.random.normal(loc = mean, scale = std_dev, size = layer_size) * np.sqrt(2 / layer_size[0])
         # return  np.random.randn(*layer_size) * np.sqrt(2 / layer_size[1])

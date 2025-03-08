@@ -8,7 +8,6 @@ import numpy as np          # To handle vector / matrix operations
 
 # Used for classification
 class CategoricalCrossEntropy:
-    
     def __init__(self) -> None:
         pass
 

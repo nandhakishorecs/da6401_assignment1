@@ -59,7 +59,7 @@ if __name__ == '__main__':
         layers = layers, 
         batch_size = 2048, 
         optimiser = 'Eve', 
-        initialisation = 'RandomInit', 
+        initialisation = 'HeInit', 
         loss_function = 'CategoricalCrossEntropy', 
         n_epochs = 1,
         target = train_y, 

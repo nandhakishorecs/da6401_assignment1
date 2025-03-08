@@ -5,6 +5,7 @@ import numpy as np          # To handle vector / matrix operations
 #   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
 # --------------------------------------------------------------------------
 
+# One way to encode labels, but the model is more versatile with one hot encoding 
 class LabelEncoder:
     __slots__ = '_label_to_num', '_num_to_label', '_classes_'
     def __init__(self) -> None:
@@ -32,11 +33,10 @@ class LabelEncoder:
         return np.array([self._num_to_label[idx] for idx in labels])    
     
 class OneHotEncoder:
-    
     def __init__(self) -> None:
         pass
     
-    def fit(self, y: np.ndarray, n_class: int ) -> None:
+    def fit(self, y: np.ndarray, n_class: int) -> None:
         self._y = y 
         self._n_class = n_class
 
@@ -71,3 +71,5 @@ class MinMaxScaler:
     def fit_transform(self, array: np.ndarray) -> np.ndarray: 
         self.fit(array)
         return self.transform(array)
+    
+# COMPLETED

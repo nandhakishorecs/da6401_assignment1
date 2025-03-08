@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__': 
     # ---------------------------- Wandb credentials ----------------------------
     wandb.init(
-        project="v1.0",             # Version number for better tracking
+        # project="v1.0",             # Version number for better tracking
     )
 
     # ---------------------------- Question 1 ----------------------------
