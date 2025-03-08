@@ -27,7 +27,8 @@ map_optimiser = {
     'RMSProp': RMSProp(),
     'AdaDelta': AdaDelta(),
     'Adam': Adam(), 
-    'Nadam': Nadam()
+    'Nadam': Nadam(), 
+    'Eve': Eve()
 }
 
 # loss function map 

@@ -58,7 +58,7 @@ if __name__ == '__main__':
     model = NeuralNetwork(
         layers = layers, 
         batch_size = 2048, 
-        optimiser = 'Nadam', 
+        optimiser = 'Eve', 
         initialisation = 'RandomInit', 
         loss_function = 'CategoricalCrossEntropy', 
         n_epochs = 1,
