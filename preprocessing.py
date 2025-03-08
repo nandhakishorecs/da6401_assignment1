@@ -31,16 +31,14 @@ class LabelEncoder:
     def inverse_transform(self, labels:np.ndarray) -> np.ndarray:
         return np.array([self._num_to_label[idx] for idx in labels])    
     
-class OneHotEncoder():
-    __slots__ = '_y', '_n_class'
+class OneHotEncoder:
+    
     def __init__(self) -> None:
-        self._y = None
-        self._n_class = 0
+        pass
     
     def fit(self, y: np.ndarray, n_class: int ) -> None:
         self._y = y 
         self._n_class = n_class
-        return self
 
     def transform(self) -> np.ndarray:
         transformed = np.zeros((self._n_class, self._y.size))
@@ -54,21 +52,22 @@ class OneHotEncoder():
 
     def inverse_transform(self, y: np.ndarray) -> np.ndarray:
         # Assumes direct correation between the position and class number
-        return np.argmax(y, axis=0)
+        y_class = np.argmax(y, axis=0)
+        return y_class
 
 class MinMaxScaler: 
-    __slots__ = '_min', '_max'
     def __init__(self) -> None:
-        self._min = 0 
-        self._max = 0
+        pass
 
     def fit(self, array: np.ndarray) -> None: 
         self._min = np.min(array, axis = 0)
         self._max = np.max(array, axis = 0)
 
     def transform(self, array: np.ndarray) -> np.ndarray: 
-        return (array - self._min) / (self._max - self._min)
+        self.fit(array)
+        transformed = (array - self._min) / (self._max - self._min)
+        return transformed 
 
     def fit_transform(self, array: np.ndarray) -> np.ndarray: 
         self.fit(array)
-        return self.fit_transform(array)
+        return self.transform(array)

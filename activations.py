@@ -13,7 +13,7 @@ class Sigmoid:
         self._b = b
     
     def value(self, X: np.ndarray) -> np.ndarray:
-        return 1 / (1 + np.exp((-1)*self._c(X + self._b)))
+        return 1/(1 + np.exp(-self._c * (X + self._b)))
     
     def _derivative(self, X: np.ndarray) -> np.ndarray:
         sigmoid_x = self.value(X)
@@ -56,12 +56,20 @@ class Softmax:
         pass
     
     def value(self, X: np.ndarray) -> np.ndarray:
-        exp_x = np.exp(X - np.max(X))  # Prevent overflow
-        return exp_x / np.sum(exp_x)
+        # exp_x = np.exp(X - np.max(X))  # Prevent overflow
+        # return exp_x / np.sum(exp_x)
+        val = np.exp(X) / np.sum(np.exp(X), axis = 0)
+        return val
+        
     
     def _derivative(self, X: np.ndarray) -> np.ndarray:
-        softmax_x = self.value(X).reshape(-1, 1)
-        return np.diagflat(softmax_x) - np.dot(softmax_x, softmax_x.T)
+        # softmax_x = self.value(X).reshape(-1, 1)
+        # return np.diagflat(softmax_x) - np.dot(softmax_x, softmax_x.T)
+        y = self.value(X)
+        mat = np.tile(y, y.shape[0])
+        val = np.diag(y.reshape(-1,)) - (mat*mat.T)
+        return val
+        
     
     def __repr__(self) -> str:
         return "Softmax"

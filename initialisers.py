@@ -17,4 +17,4 @@ class RandomInit:
 class XavierInit:
     @staticmethod
     def initialize(layer_size: int, mean: int = 0, std_dev: int = 0.05):
-        return  np.random.normal(loc = mean, scale = std_dev, size = layer_size) * np.sqrt(1 / layer_size)
+        return  np.random.normal(loc = mean, scale = std_dev, size = layer_size) * np.sqrt(1 / layer_size[0])
