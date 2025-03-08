@@ -6,6 +6,7 @@ from data_handling import MinMaxScaler
 import warnings
 warnings.filterwarnings("ignore")
 
+# python3.9 -m pip install -r requirements.txt
 if __name__ == '__main__':
     # -------------------------------- Dataset Loading --------------------------------
     [(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
@@ -87,5 +88,4 @@ if __name__ == '__main__':
 
     metrics = Metrics()
     accuracy = metrics.accuracy_score(test_y, pred_y)
-    # accuracy = np.sum(pred_y == test_y)
-    print(accuracy)
+    print(f'Accuracy:\t{accuracy}')
