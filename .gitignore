@@ -12,3 +12,6 @@ assignment1/
 
 # local tested files to check for images in questions 1 to 7
 test_image.png
+
+# test files 
+network_test.py

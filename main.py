@@ -36,12 +36,17 @@ test_y = encoder.fit_transform(y = test_y, n_class = 10)
 # Start with any number of inputs and end with 10 (we have 10 classes)
 layers = [
     Input(input_data = scaled_train_X),
-    Dense(name = 'Trail layer1', layer_size = 10, activation = 'Sigmoid')
+    Dense(name = 'Trail layer', layer_size = 32, activation = 'Tanh'),
+    Dense(name = 'Trail layer', layer_size = 64, activation = 'Tanh'),
+    Dense(name = 'Trail layer', layer_size = 128, activation = 'Sigmoid'),
+    Dense(name = 'Trail layer', layer_size = 64, activation = 'Sigmoid'),
+    Dense(name = 'Trail layer', layer_size = 32, activation = 'Tanh'),
+    Dense(name = 'Trail layer', layer_size = n_classes, activation = 'Sigmoid')
 ]
 
 
 '''
-'Vannial_GD' : VanilaGradientDescent(),
+'Vannila_GD' : VanilaGradientDescent(),
 'Momentum_GD' : MomentumGD(), 
 'Nestorov': NesterovMomentumGD(), 
 'AdaGrad': AdaGrad(), 
@@ -53,15 +58,16 @@ model = NeuralNetwork(
     layers = layers, 
     batch_size = 2048, 
     optimiser = 'Adam', 
-    initialisation='RandomInit', 
-    loss_function='CategoricalCrossEntropy', 
-    n_epochs= int(1),
-    target=train_y, 
-    validation=True, 
+    initialisation = 'RandomInit', 
+    loss_function = 'CategoricalCrossEntropy', 
+    n_epochs = int(10),
+    target = train_y, 
+    validation = True, 
     val_X = scaled_val_X, 
     val_target = val_y, 
-    wandb_log = False,
+    wandb_log = False, 
+    verbose = False
 )
 
 model.forward_propagation()
-model.backward_propagation(verbose = False)
+model.backward_propagation()
