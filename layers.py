@@ -28,7 +28,7 @@ class Input:
 
 # Dense Layer 
 class Dense:
-    def __init__(self, name: str, layer_size: int, activation: str, LastLayer: bool = False) -> None:
+    def __init__(self, name: str, layer_size: int, activation: str = 'ReLU', LastLayer: bool = False) -> None:
         self._name = name
         self._activation = activation_functions_map[activation]
         self._size = layer_size

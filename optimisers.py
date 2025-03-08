@@ -9,7 +9,7 @@ import numpy as np
 # Vannila gradient descent (only step size update using gradients)
 import numpy as np
 
-class VanilaGradientDescent:
+class GradientDescent:
     def __init__(self, lr=0.01):
         self._lr = lr
         self._update = 0
@@ -94,7 +94,7 @@ class AdaDelta:
         return self._params
 
 class Adam:
-    def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, epsilon=1e-8):
+    def __init__(self, lr=0.0001, beta1=0.9, beta2=0.999, epsilon=1e-8):
         self._lr = lr
         self._beta1 = beta1
         self._beta2 = beta2

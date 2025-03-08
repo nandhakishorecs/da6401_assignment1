@@ -45,7 +45,8 @@ class ReLU:
         return np.maximum(0, X)
     
     def _derivative(self, X: np.ndarray) -> np.ndarray:
-        return np.where(X> 0, 1, 0)
+        # return np.where(X> 0, 1, 0)
+        return (X > 0).astype(float)
     
     def __repr__(self) -> str:
         return "ReLU"
@@ -58,7 +59,8 @@ class Softmax:
     def value(self, X: np.ndarray) -> np.ndarray:
         # exp_x = np.exp(X - np.max(X))  # Prevent overflow
         # return exp_x / np.sum(exp_x)
-        val = np.exp(X) / np.sum(np.exp(X), axis = 0)
+        X = X - np.max(X, axis = 0, keepdims = True)
+        val = np.exp(X) / np.sum(np.exp(X), axis = 0, keepdims = True)
         return val
         
     
