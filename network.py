@@ -26,7 +26,8 @@ map_optimiser = {
     'AdaGrad': AdaGrad(), 
     'RMSProp': RMSProp(),
     'AdaDelta': AdaDelta(),
-    'Adam': Adam() 
+    'Adam': Adam(), 
+    'Nadam': Nadam()
 }
 
 # loss function map 
@@ -108,7 +109,7 @@ class NeuralNetwork:
             # testing
             if np.isnan(self._layers[i]._a).any():
                 print(f"NaN detected in activations at Layer {i}")
-                
+
             self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
             self._layers[i]._a_val = self._layers[i]._activation.value(self._layers[i]._h_val)
         
@@ -156,9 +157,7 @@ class NeuralNetwork:
 
                 # Compute gradient for output layer
                 self._layers[-1]._a_grad = self._loss_function.derivative(target_batch, y_batch)
-                self._layers[-1]._h_grad = self._layers[-1]._a_grad * self._layers[-1]._activation._derivative(
-                    self._layers[-1]._h[:, batch * self._batch_size: (batch + 1) * self._batch_size]
-                )
+                self._layers[-1]._h_grad = self._layers[-1]._a_grad * self._layers[-1]._activation._derivative(self._layers[-1]._h[:, batch * self._batch_size: (batch + 1) * self._batch_size])
 
                 self._layers[-1]._W_grad = self._layers[-1]._h_grad @ self._layers[-2]._a[:, batch * self._batch_size: (batch + 1) * self._batch_size].T
                 self._layers[-1]._W_update = self._layers[-1]._W_optimiser.update(self._layers[-1]._W_grad)
@@ -183,8 +182,8 @@ class NeuralNetwork:
 
                 # Update weights and biases
                 for layer in self._layers[1:]:  
-                    layer._W += layer._W_update
-                    layer._b += layer._b_update
+                    layer._W -= layer._W_update
+                    layer._b -= layer._b_update
 
                 self.forward_propagation()
 
@@ -220,5 +219,5 @@ class NeuralNetwork:
         else: 
             pred_y = a
         
-        # return np.argmax(pred_y, axis = 0)
-        return pred_y
+        return np.argmax(pred_y, axis = 0)
+        # return pred_y

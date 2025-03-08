@@ -10,7 +10,7 @@ import numpy as np          # To handle vector / matrix operations
 class CategoricalCrossEntropy:
     
     def __init__(self) -> None:
-        pass 
+        pass
 
     def value(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         epsilon = 1e-12

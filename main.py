@@ -58,10 +58,10 @@ if __name__ == '__main__':
     model = NeuralNetwork(
         layers = layers, 
         batch_size = 2048, 
-        optimiser = 'SGD', 
+        optimiser = 'Nadam', 
         initialisation = 'RandomInit', 
         loss_function = 'CategoricalCrossEntropy', 
-        n_epochs = 10,
+        n_epochs = 1,
         target = train_y, 
         validation = True, 
         val_X = scaled_val_X, 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     pred_y = model.predict(test_X = test)
     print(pred_y)
 
-    # metrics = Metrics()
-    # accuracy = metrics.accuracy_score(test_y, pred_y)
-    accuracy = np.sum(pred_y == test_y)
+    metrics = Metrics()
+    accuracy = metrics.accuracy_score(test_y, pred_y)
+    # accuracy = np.sum(pred_y == test_y)
     print(accuracy)

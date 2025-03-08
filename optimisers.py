@@ -111,7 +111,35 @@ class Adam:
         self._t += 1
         self._m = self._beta1 * self._m + (1 - self._beta1) * grads
         self._v = self._beta2 * self._v + (1 - self._beta2) * (grads ** 2)
+        # Bias correction 
         m_hat = self._m / (1 - self._beta1 ** self._t)
         v_hat = self._v / (1 - self._beta2 ** self._t)
         self._params -= self._lr * m_hat / (np.sqrt(v_hat) + self._epsilon)
+        return self._params
+import numpy as np
+
+class Nadam:
+    def __init__(self, lr=0.0001, beta1=0.9, beta2=0.999, epsilon=1e-8):
+        self._lr = lr
+        self._beta1 = beta1
+        self._beta2 = beta2
+        self._epsilon = epsilon
+        self._m = 0
+        self._v = 0
+        self._t = 0
+        self._params = 0
+    
+    def set_parameters(self, params):
+        self._params = params
+    
+    def update(self, grads):
+        self._t += 1
+        self._m = self._beta1 * self._m + (1 - self._beta1) * grads
+        self._v = self._beta2 * self._v + (1 - self._beta2) * (grads ** 2)
+        # Bias correction 
+        m_hat = self._m / (1 - self._beta1 ** self._t)
+        v_hat = self._v / (1 - self._beta2 ** self._t)
+        # Nadam-specific Nesterov term
+        nesterov_m = self._beta1 * m_hat + (1 - self._beta1) * grads / (1 - self._beta1 ** self._t)
+        self._params -= self._lr * nesterov_m / (np.sqrt(v_hat) + self._epsilon)
         return self._params
