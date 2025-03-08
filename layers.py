@@ -23,23 +23,19 @@ initialiser_map = {
 # We have K layers - Kth layer is output, 1st layer is Input and we have L-1 Hidden layers 
 # Input Layer 
 class Input:
-    __slots__ = ['_input_data']
-    
     def __init__(self, input_data) -> None:
         self._input_data = np.array(input_data)
+        self._size = self._input_data.shape[0]
+        self._a = self._input_data
     
     def __repr__(self) -> str:
-        return "InputLayer"
+        return f"Input Layer with size {self._size}"
 
+# Dense Layer 
 class Dense:
-    __slots__ = ['_weights', '_biases', '_activation', '_input_data', '_output_data']
-    
-    def __init__(self, input_size: int, output_size: int, activation: str, initializer) -> None:
-        self._weights = initializer.initialize(input_size, output_size)
-        self._biases = np.zeros((1, output_size))
+    def __init__(self, layer_size: int, activation: str, LastLayer: bool = False) -> None:
         self._activation = activation_functions_map[activation]
-        self._input_data = None
-        self._output_data = None
-    
+        self._size = layer_size
+
     def __repr__(self) -> str:
-        return "Dense"
+        return f"Dense Layer with size: {self._size} | Activation: {self._activation}"
