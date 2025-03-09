@@ -242,3 +242,24 @@ class NeuralNetwork:
         
         # y = encoder.inverse_transform(pred_y)
         return np.argmax(pred_y, axis = 0)
+
+    # used for debugging
+    def log(self, test_X: np.ndarray, test_t: np.ndarray): 
+        self._layers[0]._a_test = test_X
+        for i in range(1, len(self._layers)):
+            self._layers[i]._h_test = self._layers[i]._W @ self._layers[i-1]._a_test - self._layers[i]._b
+            self._layers[i]._a_test = self._layers[i]._activation.value(self._layers[i]._h_test)
+        
+        if(self._loss_type == 'CategoricalCrossEntropy'):
+            self._layers[-1]._y_test = Softmax().value(self._layers[-1]._a_test)
+        else: 
+            self._layers[-1]._y_test = self._layers[-1]._a_test
+
+        test_loss = self._loss_function.value(test_t, self._layers[-1]._a_test)
+
+        encoder = OneHotEncoder()
+        y_tmp = encoder.inverse_transform(self.layers[-1]._y_test)
+        t_tmp = encoder.inverse_transform(test_t)
+        loss_accuracy = np.sum(y_tmp == t_tmp)
+
+        return test_loss, loss_accuracy
