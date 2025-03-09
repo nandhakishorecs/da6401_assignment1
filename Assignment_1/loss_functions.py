@@ -12,9 +12,8 @@ class CategoricalCrossEntropy:
         pass
 
     def value(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        epsilon = 1e-12
-        y_pred = np.clip(y_pred, epsilon, 1. - epsilon)
-        return (-1) * np.sum(y_true * np.log(y_pred)) / y_true.shape[0]
+        # y_pred = np.clip(y_pred, epsilon, 1. - epsilon)
+        return (-1) * np.sum(np.sum(y_true * np.log(y_pred))) 
     
     def derivative(self, y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
         return (-1) * y_true / y_pred
@@ -28,10 +27,10 @@ class MeanSquaredError:
         pass
     
     def value(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        return np.mean((y_true - y_pred) ** 2)
+        return np.sum((y_true - y_pred) ** 2)
     
     def derivative(self, y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
-        return -2 * (y_true - y_pred) / y_true.shape[0]
+        return -1 * (y_true - y_pred) 
     
     def __repr__(self) -> str:
         return "MeanSquaredError"

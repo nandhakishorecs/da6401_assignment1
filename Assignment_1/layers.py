@@ -24,7 +24,7 @@ class Input:
         self._a = self._input_data
     
     def __repr__(self) -> str:
-        return f"Input Layer with size {self._size}"
+        return f"Input Layer with size {self._size}\n"
 
 # Dense Layer 
 class Dense:
@@ -34,6 +34,8 @@ class Dense:
         self._size = layer_size
 
     def __repr__(self) -> str:
-        return f"Layer name: {self._name} | Dense Layer with size: {self._size} | Activation: {self._activation}"
+        if(self._name == 'Last_Layer'):
+            return f"{self._name} | Dense Layer with size: {self._size} | Activation: Softmax\n" 
+        return f"Layer name: {self._name} | Dense Layer with size: {self._size} | Activation: {self._activation}\n"
     
 # COMPLETED

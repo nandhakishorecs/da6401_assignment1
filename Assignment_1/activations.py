@@ -42,11 +42,17 @@ class ReLU:
         pass
     
     def value(self, X: np.ndarray) -> np.ndarray:
-        return np.maximum(0, X)
+        # return np.maximum(0, X)
+        val = X 
+        val[val < 0] = 0
+        return val 
     
     def _derivative(self, X: np.ndarray) -> np.ndarray:
         # return np.where(X> 0, 1, 0)
-        return (X > 0).astype(float)
+        # return (X > 0).astype(float)
+        val = np.ones(X.shape)
+        val[val < 0] = 0
+        return val
     
     def __repr__(self) -> str:
         return "ReLU"
