@@ -22,157 +22,156 @@ class GradientDescent:
         self._update = self._lr * grad
         return self._update
 
-class MomentumGD:
+class MomentumGD(GradientDescent):
     def __init__(self, lr: float = 0.001, momentum: float = 0.9) -> None:
-        self._lr = lr
-        self._momentum = momentum
-        self._velocity = 0
-        self._params = 0 
-    
-    def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
+        super().__init__(lr)
+        self._momentum = momentum                     
     
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._velocity = self._momentum * self._velocity - self._lr * grads
-        self._params += self._velocity
-        return self._params
+        self._update = (self._momentum * self._update) + (self._lr * grads)
+        # self._params += self._velocity
+        return self._update
 
-class NesterovMomentumGD(MomentumGD):
+class NesterovMomentumGD(GradientDescent):
+    def __init__(self, lr: float = 0.001, momentum: float = 0.9) -> None:
+        super().__init__(lr)
+        self._momentum = momentum
+
     def update(self, grads: np.ndarray) -> np.ndarray:
-        lookahead_params = self._params + self._momentum * self._velocity
-        self._velocity = self._momentum * self._velocity - self._lr * grads
-        self._params = lookahead_params + self._velocity
-        return self._params
+        lookahead = self._momentum * self._update                   # Apply momentum first (lookahead step)
+        grads_at_lookahead = grads - (self._momentum * grads)       # Approximate Nesterov update
+        self._update = lookahead + (self._lr * grads_at_lookahead)
+        return self._update
 
 class AdaGrad:
-    def __init__(self, lr: float = 0.01, epsilon: float = 1e-8) -> None:
+    def __init__(self, lr: float = 1e-2, epsilon: float = 1e-7) -> None:
         self._lr = lr
         self._epsilon = epsilon
         self._G = 0
-        self._params = 0
-    
+            
     def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
+        for key in params: 
+            setattr(self, key, params[key])
     
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._G += grads ** 2
-        self._params -= self._lr * grads / (np.sqrt(self._G) + self._epsilon)
-        return self._params
+        self._G += (grads ** 2)
+        effective_lr = self._lr/((self._G + self._epsilon) ** (1/2))
+        return effective_lr * grads
 
-class RMSProp:
-    def __init__(self, lr: float = 0.001, decay_rate: float = 0.9, epsilon: float = 1e-8) -> None:
-        self._lr = lr
+class RMSProp(AdaGrad):
+    def __init__(self, lr: float = 1e-2, decay_rate: float = 0.9, epsilon: float = 1e-7) -> None:
+        super().__init__(lr, epsilon)
         self._decay_rate = decay_rate
-        self._epsilon = epsilon
-        self._G = 0
-        self._params = 0
-    
-    def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
     
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._G = self._decay_rate * self._G + (1 - self._decay_rate) * grads ** 2
-        self._params -= self._lr * grads / (np.sqrt(self._G) + self._epsilon)
-        return self._params
+        self._G = (self._decay_rate * self._G) + (1 - self._decay_rate) * (grads ** 2)
+        effective_lr = ((self._lr) / (self._G + self._epsilon)**(1/2))
+        return effective_lr * grads
 
+# The implementation is working, but not used in sweep
 class AdaDelta:
-    def __init__(self, decay_rate: float = 0.95, epsilon: float = 1e-6) -> None:
+    def __init__(self, decay_rate: float = 0.95, epsilon: float = 1e-7) -> None:
+        # decay rate is noted as lr for ease of coding
         self._lr = decay_rate
         self._epsilon = epsilon
         self._G = 0
         self._delta = 0
-        self._params = 0
-    
+
     def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
+        for key in params: 
+            setattr(self, key, params[key])
     
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._G = self._lr * self._G + (1 - self._lr) * grads ** 2
-        update_step = - (np.sqrt(self._delta + self._epsilon) / np.sqrt(self._G + self._epsilon)) * grads
-        self._delta = self._lr * self._delta + (1 - self._lr) * update_step ** 2
-        self._params += update_step
-        return self._params
+        self._G = (self._G * self._lr) + ((1 - self._lr) * (grads ** 2))
+        # update_step = (-1)*(np.sqrt(self._delta) + self._epsilon) / (np.sqrt(self._G) + self._epsilon) * grads
+        update_step = (-1) * ((np.sqrt(self._delta) + self._epsilon) / (np.sqrt(self._G) + self._epsilon)) * grads
+        self._delta = (self._lr * self._delta) + ((1 - self._lr) * (update_step ** 2))
+        return update_step
 
 class Adam:
-    def __init__(self, lr: float = 0.0001, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-8) -> None:
+    def __init__(self, lr: float = 1e-3, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-7) -> None:
         self._lr = lr
-        self._beta1 = beta1
-        self._beta2 = beta2
+        self._beta1 = beta1     # Decay rate for first moment (momentum)
+        self._beta2 = beta2     # Decay rate for second moment (RMSProp-like)
         self._epsilon = epsilon
-        self._m = 0
-        self._v = 0
-        self._t = 0
-        self._params = 0
+        self._m = 0             # First moment (mean of gradients)
+        self._v = 0             # Second moment (uncentered variance of gradients)
+        self._t = 1             # Time step (for bias correction)
     
     def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
-    
-    def update(self, grads: np.ndarray) -> np.ndarray:
-        self._t += 1
-        self._m = self._beta1 * self._m + (1 - self._beta1) * grads
-        self._v = self._beta2 * self._v + (1 - self._beta2) * (grads ** 2)
-        # Bias correction 
-        m_hat = self._m / (1 - self._beta1 ** self._t)
-        v_hat = self._v / (1 - self._beta2 ** self._t)
-        self._params -= self._lr * m_hat / (np.sqrt(v_hat) + self._epsilon)
-        return self._params
+        for key in params:
+            setattr(self, key, params[key])
 
-class Nadam:
-    def __init__(self, lr: float = 0.0001, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-8) -> None:
-        self._lr = lr
-        self._beta1 = beta1
-        self._beta2 = beta2
-        self._epsilon = epsilon
-        self._m = 0
-        self._v = 0
-        self._t = 0
-        self._params = 0
-    
-    def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
-    
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._t += 1
-        self._m = self._beta1 * self._m + (1 - self._beta1) * grads
-        self._v = self._beta2 * self._v + (1 - self._beta2) * (grads ** 2)
-        # Bias correction 
+        self._t += 1  # Increment time step
+        
+        self._m = (self._beta1 * self._m) + ((1 - self._beta1) * grads)
+        self._v = (self._beta2 * self._v) + ((1 - self._beta2) * (grads ** 2))
+        
+        # Bias Correction 
         m_hat = self._m / (1 - self._beta1 ** self._t)
         v_hat = self._v / (1 - self._beta2 ** self._t)
-        # Nadam-specific Nesterov term
-        nesterov_m = self._beta1 * m_hat + (1 - self._beta1) * grads / (1 - self._beta1 ** self._t)
-        self._params -= self._lr * nesterov_m / (np.sqrt(v_hat) + self._epsilon)
-        return self._params
-class Eve:
-    def __init__(self, lr: float = 0.0001, beta1: float = 0.9, beta2: float = 0.999, beta3: float = 0.999, epsilon: float = 1e-8) -> None:
-        self._lr = lr
-        self._beta1 = beta1
-        self._beta2 = beta2
-        self._beta3 = beta3
-        self._epsilon = epsilon
-        self._m = 0
-        self._v = 0
-        self._d = 1
-        self._t = 0
-        self._params = 0
-    
-    def set_parameters(self, params: np.ndarray) -> None:
-        self._params = params
-    
+        
+        # Compute adaptive update
+        update_val = (self._lr / (v_hat + self._epsilon) ** (1/2)) * m_hat
+
+        return update_val
+
+class Nadam(Adam):
+    def __init__(self, lr: float = 1e-3, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-7) -> None:
+        super().__init__(lr, beta1, beta2, epsilon)
+
     def update(self, grads: np.ndarray) -> np.ndarray:
-        self._t += 1
-        self._m = self._beta1 * self._m + (1 - self._beta1) * grads
-        self._v = self._beta2 * self._v + (1 - self._beta2) * (grads ** 2)
+        self._t += 1  # Increment time step
+        
+        # Compute biased first moment estimate (momentum)
+        self._m = (self._beta1 * self._m) + ((1 - self._beta1) * grads)
+        self._v = (self._beta2 * self._v) + ((1 - self._beta2) * (grads ** 2))
         
         # Bias correction
         m_hat = self._m / (1 - self._beta1 ** self._t)
         v_hat = self._v / (1 - self._beta2 ** self._t)
         
-        # Compute d_t for adaptive learning rate scaling
-        d_t = 1 + np.log(v_hat + self._epsilon)
-        self._d = self._beta3 * self._d + (1 - self._beta3) * d_t
-        
-        # Update parameters
-        self._params -= (self._lr / self._d) * m_hat / (np.sqrt(v_hat) + self._epsilon)
-        return self._params
-    
+        # Nesterov momentum correction
+        m_nesterov = (self._beta1 * m_hat) + ((1 - self._beta1) * grads)  
+
+        # Compute adaptive update
+        update_val = (self._lr / (np.sqrt(v_hat) + self._epsilon)) * m_nesterov
+
+        return update_val
+
+class Eve(Adam):
+    def __init__(self, lr: float = 1e-3, beta1: float = 0.9, beta2: float = 0.999, beta3: float = 0.999, epsilon: float = 1e-8) -> None:
+        super().__init__(lr, beta1, beta2, epsilon)
+        self._beta3 = beta3  # Decay rate for smoothing relative loss changes
+        self._f_prev = None  # Stores previous loss for adaptive learning rate
+
+    def set_loss(self, loss: float) -> None:
+        if self._f_prev is None:
+            self._f_prev = loss  # Initialize only once
+        else:
+            self._adjust_learning_rate(loss)
+
+    def _adjust_learning_rate(self, loss: float) -> None:
+        d = abs(loss - self._f_prev) / (min(loss, self._f_prev) + self._epsilon)  # Relative loss change
+        d_hat = self._beta3 * d + (1 - self._beta3) * (self._f_prev / (loss + self._epsilon))  # Smoothed factor
+        self._lr *= (1 + np.tanh(d_hat - 1))  # Update learning rate adaptively
+        self._f_prev = loss  # Store loss for next step
+
+    def update(self, grads: np.ndarray) -> np.ndarray:
+        self._t += 1  # Increment time step
+
+        # Compute biased first and second moment estimates
+        self._m = (self._beta1 * self._m) + ((1 - self._beta1) * grads)
+        self._v = (self._beta2 * self._v) + ((1 - self._beta2) * (grads ** 2))
+
+        # Bias correction
+        m_hat = self._m / (1 - self._beta1 ** self._t)
+        v_hat = self._v / (1 - self._beta2 ** self._t)
+
+        # Compute adaptive update
+        update_val = (self._lr / (np.sqrt(v_hat) + self._epsilon)) * m_hat
+
+        return update_val
+
 # COMPLETED

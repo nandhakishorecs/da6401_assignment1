@@ -81,11 +81,9 @@ class NeuralNetwork:
         for layer in self._layers[1: ]: 
             layer._W_size = (layer._size, size_prev)
             size_prev = layer._size
-
-            layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](lr = self._lr))
-            layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](lr = self._lr))
-            # layer._W_optimiser = deepcopy(map_optimiser[self._optimiser])
-            # layer._b_optimiser = deepcopy(map_optimiser[self._optimiser])
+            
+            layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr))
+            layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr))
 
         if(self._initialisation == 'RandomInit'):
             for layer in self._layers[1: ]: 
@@ -139,6 +137,7 @@ class NeuralNetwork:
         for epoch in tqdm(range(self._n_epochs)):
             # Logging locally
             lr_log.append(self._layers[-1]._W_optimiser._lr)
+            
             train_loss_log.append(self._loss_function.value(self._target, self._layers[-1]._y))
             val_loss_log.append(self._loss_function.value(self._val_target, self._layers[-1]._y_val))
         
@@ -192,7 +191,8 @@ class NeuralNetwork:
 
                 # Update weights and biases
                 for _ , layer in enumerate(self._layers[1:]):
-                    layer._W -= layer._W_update
+                    # layer._W -= layer._W_update
+                    layer._W -= layer._W_update + (self._weight_decay * layer._W)
                     layer._b -= layer._b_update
                     
                 self.forward_propagation()
@@ -208,17 +208,17 @@ class NeuralNetwork:
         # train_t = np.argmax(train_t, axis = 0)
         train_y = encoder.inverse_transform(self._layers[-1]._y)
         # train_y = np.argmax(train_y, axis = 0)
-
-        # training_accuracy = metrics.accuracy_score(train_t, train_y)
-        training_accuracy = np.sum(train_t == train_y)
+        from sklearn import metrics
+        training_accuracy = metrics.accuracy_score(train_t, train_y)
+        # training_accuracy = np.sum(train_t == train_y)
         if(self._validation): 
             val_t = encoder.inverse_transform(self._val_target)
             # val_t = np.argmax(val_t, axis = 0)
             val_y = encoder.inverse_transform(self._layers[-1]._y_val)
             # val_y = np.argmax(val_y, axis = 0)
 
-            # validation_accuracy = metrics.accuracy_score(val_t, val_y) 
-            validation_accuracy = np.sum(val_t == val_y)
+            validation_accuracy = metrics.accuracy_score(val_t, val_y) 
+            # validation_accuracy = np.sum(val_t == val_y)
 
             if(self._verbose):
                 print(f'Training accuracy: {training_accuracy}\tValidation accuracy: {validation_accuracy}')

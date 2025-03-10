@@ -5,9 +5,10 @@ from network import NeuralNetwork  # Assuming your neural network class is in ne
 from layers import Dense, Input
 from data_handling import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
+# from sklearn import metrics
+import tensorflow as tf
 
-[(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
+[(train_X, train_y), (test_X, test_y)] = tf.keras.datasets.fashion_mnist.load_data()
 train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.2, random_state=42)
 
 # Number of Unique classes 
@@ -40,20 +41,20 @@ test_y = encoder.fit_transform(y = test_y, n_class = 10)
 
 # Define sweep configuration
 sweep_config = {
-    'name': 'PC_sweep',
+    'name': 'complete_sweep_1',
     'method': 'bayes',  # use 'grid', 'random' or 'bayes' for different search methods
     'metric': {'name': 'Validation_Accuracy', 'goal': 'maximize'},
     'parameters': {
-        'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']}, # Sigmoid
+        'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']}, 
         'layer_size': {'values': [32, 64, 128]}, 
         'n_layers': {'values': [3, 4, 5]},
-        'learning_rate': {'values': [1e-2, 1e-3, 1e-4]}, # 1e-2, 
-        'batch_size': {'values': [128, 512, 8192]}, 
+        'learning_rate': {'values': [1e-2, 1e-3, 1e-4]},
+        'batch_size': {'values': [32, 64, 128, 512, 1024]}, 
         'optimiser': {'values': ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']},
-        'n_epochs': {'values': [5, 10]},
+        'n_epochs': {'values': [10, 20]},
         'initialisation': {'values': ['RandomInit', 'XavierInit', 'HeInit']}, # 
-        'weight_decay': {'values': [0, 0.0005, 0.5]}, 
-        'loss_function': {'values': ['CategoricalCrossEntropy', 'MeanSquaredError']}
+        'weight_decay': {'values': [0, 0.0005, 0.5]}
+        # 'loss_function': {'values': ['CategoricalCrossEntropy', 'MeanSquaredError']}
     }
 }
 
@@ -65,7 +66,7 @@ def train_sweep():
         project='da6401_assignment1'  # project name 
     )
     config = wandb.config
-    wandb.run.name = f"act_{config.activation}_hl_{config.layer_size}_nlayers_{config.n_layers}_lr_{config.learning_rate}_bs_{config.batch_size}_opt_{config.optimiser}_e_{config.n_epochs}_init_{config.initialisation}_wd_{config.weight_decay}_loss_{config.loss_funtion}"
+    wandb.run.name = f"act_{config.activation}_hl_{config.layer_size}_nlayers_{config.n_layers}_lr_{config.learning_rate}_bs_{config.batch_size}_opt_{config.optimiser}_e_{config.n_epochs}_init_{config.initialisation}_wd_{config.weight_decay}"#_loss_{config.loss_function}" 
 
 
     # Create input layer
@@ -85,11 +86,11 @@ def train_sweep():
         batch_size=config.batch_size,
         optimiser=config.optimiser,
         n_epochs=config.n_epochs,
-        loss_function=config.loss_function,
         initialisation=config.initialisation,
         learning_rate=config.learning_rate,
         weight_decay=config.weight_decay,
         # default values 
+        loss_function='CategoricalCrossEntropy',
         target=train_y,
         validation=True,
         val_X=scaled_val_X,
@@ -105,4 +106,4 @@ def train_sweep():
     wandb.finish()
 
 # Run sweep
-wandb.agent(sweep_id, function=train_sweep, count=100)
+wandb.agent(sweep_id, function=train_sweep, count=120)

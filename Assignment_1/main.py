@@ -1,4 +1,4 @@
-import keras 
+import keras
 from network import * 
 # from network_backup import *
 from sklearn.model_selection import train_test_split
@@ -43,28 +43,25 @@ if __name__ == '__main__':
     # Start with any number of inputs and end with 10 (we have 10 classes)
     layers = [
         Input(input_data = scaled_train_X),
-        Dense(name = 'Hidden Layer 1', layer_size = 512, activation = 'ReLU'),
-        Dense(name = 'Hidden Layer 2', layer_size = 256, activation = 'ReLU'),
-        Dense(name = 'Hidden Layer 3', layer_size = 128, activation = 'ReLU'),
-        Dense(name = 'Hidden Layer 4', layer_size = 64, activation = 'ReLU'),
-        Dense(name = 'Hidden Layer 5', layer_size = 32, activation = 'ReLU'),
-        Dense(name = 'Last_Layer', layer_size = 10)
+        Dense(name = 'Hidden Layer 1', layer_size = 32, activation = 'Sigmoid'),
+        Dense(name = 'Hidden Layer 2', layer_size = 32, activation = 'Sigmoid'),
+        Dense(name = 'Last_Layer', layer_size = 10) #, activation = 'Softmax')
     ]
     print(layers)
     model = NeuralNetwork(
         layers = layers, 
-        batch_size = 1024, 
-        optimiser = 'SGD', 
+        batch_size = 512, 
+        optimiser = 'AdaDelta', 
         initialisation = 'RandomInit', 
         loss_function = 'CategoricalCrossEntropy', 
-        n_epochs = 5,
+        n_epochs = 4,
         target = onehot_train_y,
-        learning_rate = 0.001, 
+        learning_rate = 1e-2, 
         validation = True, 
         val_X = scaled_val_X, 
         val_target = onehot_val_y, 
         optimised_parameters = None, 
-        weight_decay = 0,
+        weight_decay = 0.0005,
         wandb_log = False, 
         verbose = True
     )
@@ -81,9 +78,10 @@ if __name__ == '__main__':
     print(pred_y)
 
     # metrics = Metrics()
-    # from sklearn import metrics
+    from sklearn import metrics
     # metrics = sklearn.metrics()
-    accuracy = np.sum(test_y == pred_y)
+    # accuracy = np.sum(test_y == pred_y)
+    accuracy = metrics.accuracy_score(test_y, pred_y)
     print(f'Accuracy:\t{accuracy}')
 
     # train_acc, val_acc = model._get_accuracy()
