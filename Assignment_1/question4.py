@@ -40,18 +40,20 @@ test_y = encoder.fit_transform(y = test_y, n_class = 10)
 
 # Define sweep configuration
 sweep_config = {
-    'method': 'grid',  # You can use 'random' or 'bayes' for different search methods
+    'name': 'PC_sweep',
+    'method': 'bayes',  # use 'grid', 'random' or 'bayes' for different search methods
     'metric': {'name': 'Validation_Accuracy', 'goal': 'maximize'},
     'parameters': {
-        'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']},
-        'layer_size': {'values': [32, 64, 128]},
+        'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']}, # Sigmoid
+        'layer_size': {'values': [32, 64, 128]}, 
         'n_layers': {'values': [3, 4, 5]},
-        'learning_rate': {'values': [1e-3, 1e-4]},
-        'batch_size': {'values': [2048, 8192, 65_536]},
+        'learning_rate': {'values': [1e-2, 1e-3, 1e-4]}, # 1e-2, 
+        'batch_size': {'values': [128, 512, 8192]}, 
         'optimiser': {'values': ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']},
-        'n_epochs': {'values': [5, 10, 15, 20]},
-        'initialisation': {'values': ['RandomInit', 'Xavier', 'HeInit']},
-        'weight_decay': {'values': [0, 0.0005, 0.5]}
+        'n_epochs': {'values': [5, 10]},
+        'initialisation': {'values': ['RandomInit', 'XavierInit', 'HeInit']}, # 
+        'weight_decay': {'values': [0, 0.0005, 0.5]}, 
+        'loss_function': {'values': ['CategoricalCrossEntropy', 'MeanSquaredError']}
     }
 }
 
@@ -59,11 +61,13 @@ sweep_id = wandb.sweep(sweep_config,project='da6401_assignment1')  # project nam
 
 def train_sweep():
     wandb.init(
-        entity='Trial_3'  # team name 
-        # project='da6401_assignment1'  # project name 
+        entity='Trial_4',  # team name 
+        project='da6401_assignment1'  # project name 
     )
     config = wandb.config
-    
+    wandb.run.name = f"act_{config.activation}_hl_{config.layer_size}_nlayers_{config.n_layers}_lr_{config.learning_rate}_bs_{config.batch_size}_opt_{config.optimiser}_e_{config.n_epochs}_init_{config.initialisation}_wd_{config.weight_decay}_loss_{config.loss_funtion}"
+
+
     # Create input layer
     input_layer = Input(scaled_train_X)
     
@@ -72,24 +76,26 @@ def train_sweep():
     for i in range(config.n_layers-1):
         layers.append(Dense(name=f"Hidden_Layer_{i+1}", layer_size=config.layer_size, activation=config.activation))
         
-    layers.append(Dense(name='Last_Layer', layer_size=n_classes, activation=config.activation))
+    layers.append(Dense(name='Last_Layer', layer_size=n_classes)) # default Softmax
 
     # Create neural network instance
     model = NeuralNetwork(
+        # hyper parameters from config 
         layers=layers,
         batch_size=config.batch_size,
         optimiser=config.optimiser,
         n_epochs=config.n_epochs,
-        target=train_y,
-        loss_function='CategoricalCrossEntropy',
+        loss_function=config.loss_function,
         initialisation=config.initialisation,
         learning_rate=config.learning_rate,
+        weight_decay=config.weight_decay,
+        # default values 
+        target=train_y,
         validation=True,
         val_X=scaled_val_X,
         val_target=val_y,
         wandb_log=True,
         verbose=False,
-        weight_decay=config.weight_decay
     )
     
     # Train the model
@@ -99,4 +105,4 @@ def train_sweep():
     wandb.finish()
 
 # Run sweep
-wandb.agent(sweep_id, function=train_sweep, count=64)
+wandb.agent(sweep_id, function=train_sweep, count=100)

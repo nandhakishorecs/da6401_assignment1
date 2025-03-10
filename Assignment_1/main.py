@@ -53,9 +53,9 @@ if __name__ == '__main__':
     print(layers)
     model = NeuralNetwork(
         layers = layers, 
-        batch_size = 64, 
-        optimiser = 'Adam', 
-        initialisation = 'XavierInit', 
+        batch_size = 1024, 
+        optimiser = 'SGD', 
+        initialisation = 'RandomInit', 
         loss_function = 'CategoricalCrossEntropy', 
         n_epochs = 5,
         target = onehot_train_y,
