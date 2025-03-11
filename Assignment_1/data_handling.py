@@ -33,6 +33,7 @@ class LabelEncoder:
         return np.array([self._num_to_label[idx] for idx in labels])    
     
 class OneHotEncoder:
+    __slots__ = '_y', '_n_class'
     def __init__(self) -> None:
         pass
     
@@ -56,6 +57,7 @@ class OneHotEncoder:
         return y_class
 
 class MinMaxScaler: 
+    __slots__ = '_min', '_max'
     def __init__(self) -> None:
         pass
 

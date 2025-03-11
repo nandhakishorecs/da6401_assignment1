@@ -43,17 +43,25 @@ if __name__ == '__main__':
     # Start with any number of inputs and end with 10 (we have 10 classes)
     layers = [
         Input(input_data = scaled_train_X),
-        Dense(name = 'Hidden Layer 1', layer_size = 32, activation = 'Sigmoid'),
-        Dense(name = 'Hidden Layer 2', layer_size = 32, activation = 'Sigmoid'),
+        Dense(name = 'Hidden Layer 1', layer_size = 32, activation = 'Identity'),
         Dense(name = 'Last_Layer', layer_size = 10) #, activation = 'Softmax')
     ]
-    print(layers)
+
+    # 'sgd' : GradientDescent,
+    # 'momentum' : MomentumGD, 
+    # 'nag': NesterovMomentumGD, 
+    # 'adagrad': AdaGrad, 
+    # 'rmsprop': RMSProp,
+    # 'adadelta': AdaDelta,
+    # 'adam': Adam, 
+    # 'nadam': Nadam, 
+    # 'eve': Eve
     model = NeuralNetwork(
         layers = layers, 
-        batch_size = 512, 
-        optimiser = 'AdaDelta', 
-        initialisation = 'RandomInit', 
-        loss_function = 'CategoricalCrossEntropy', 
+        batch_size = 4096, 
+        optimiser = 'eve', 
+        initialisation = 'random', 
+        loss_function = 'cross_entropy', 
         n_epochs = 4,
         target = onehot_train_y,
         learning_rate = 1e-2, 
@@ -66,23 +74,21 @@ if __name__ == '__main__':
         verbose = True
     )
 
-    test = scaled_test_X
-    # print(test.shape)
-    # print(len(test))
+    # test = scaled_test_X
+    # # print(test.shape)
+    # # print(len(test))
 
-    model.forward_propagation()
-    model.backward_propagation()
+    # model.forward_propagation()
+    # model.backward_propagation()
 
-    # predictions - yet to be implemented
-    pred_y = model.predict(test_X = test)
-    print(pred_y)
+    # # predictions - yet to be implemented
+    # pred_y = model.predict(test_X = test)
+    # print(pred_y)
 
     # metrics = Metrics()
-    from sklearn import metrics
-    # metrics = sklearn.metrics()
-    # accuracy = np.sum(test_y == pred_y)
-    accuracy = metrics.accuracy_score(test_y, pred_y)
-    print(f'Accuracy:\t{accuracy}')
 
-    # train_acc, val_acc = model._get_accuracy()
-    # print(f'Accuracy:\t{train_acc} and {val_acc}')
+    # accuracy = metrics.accuracy_score(test_y, pred_y)
+    # print(f'Accuracy:\t{accuracy}')
+
+    # model._check(scaled_test_X, onehot_test_y)
+    print(model)

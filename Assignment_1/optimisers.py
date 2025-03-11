@@ -10,6 +10,7 @@ import numpy as np
 import numpy as np
 
 class GradientDescent:
+    __slots__ = '_lr', '_update'
     def __init__(self, lr: float = 0.01) -> None:
         self._lr = lr
         self._update = 0
@@ -23,6 +24,7 @@ class GradientDescent:
         return self._update
 
 class MomentumGD(GradientDescent):
+    __slots__ = '_momentum'
     def __init__(self, lr: float = 0.001, momentum: float = 0.9) -> None:
         super().__init__(lr)
         self._momentum = momentum                     
@@ -33,6 +35,7 @@ class MomentumGD(GradientDescent):
         return self._update
 
 class NesterovMomentumGD(GradientDescent):
+    __slots__ = '_momentum'
     def __init__(self, lr: float = 0.001, momentum: float = 0.9) -> None:
         super().__init__(lr)
         self._momentum = momentum
@@ -44,6 +47,7 @@ class NesterovMomentumGD(GradientDescent):
         return self._update
 
 class AdaGrad:
+    __slots__ = '_lr', '_epsilon', '_G'
     def __init__(self, lr: float = 1e-2, epsilon: float = 1e-7) -> None:
         self._lr = lr
         self._epsilon = epsilon
@@ -59,6 +63,7 @@ class AdaGrad:
         return effective_lr * grads
 
 class RMSProp(AdaGrad):
+    __slots__ = '_decay_rate'
     def __init__(self, lr: float = 1e-2, decay_rate: float = 0.9, epsilon: float = 1e-7) -> None:
         super().__init__(lr, epsilon)
         self._decay_rate = decay_rate
@@ -70,6 +75,7 @@ class RMSProp(AdaGrad):
 
 # The implementation is working, but not used in sweep
 class AdaDelta:
+    __slots__ = '_lr', '_epsilon', '_G', '_delta'
     def __init__(self, decay_rate: float = 0.95, epsilon: float = 1e-7) -> None:
         # decay rate is noted as lr for ease of coding
         self._lr = decay_rate
@@ -89,6 +95,7 @@ class AdaDelta:
         return update_step
 
 class Adam:
+    __slots__ = '_lr', '_beta1', '_beta2', '_epsilon', '_m', '_v', '_t'
     def __init__(self, lr: float = 1e-3, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-7) -> None:
         self._lr = lr
         self._beta1 = beta1     # Decay rate for first moment (momentum)
@@ -141,6 +148,7 @@ class Nadam(Adam):
         return update_val
 
 class Eve(Adam):
+    __slots__ = '_beta3', '_f_prev'
     def __init__(self, lr: float = 1e-3, beta1: float = 0.9, beta2: float = 0.999, beta3: float = 0.999, epsilon: float = 1e-8) -> None:
         super().__init__(lr, beta1, beta2, epsilon)
         self._beta3 = beta3  # Decay rate for smoothing relative loss changes

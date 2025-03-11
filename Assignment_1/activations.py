@@ -7,6 +7,21 @@ import numpy as np          # To handle vector / matrix operations
 # --------------------------------------------------------------------------
 
 # used for any hidden layer in a neural network 
+class Identity:
+    def __init__(self, c: float = 1, b: float = 0) -> None:
+        self._c = c
+        self._b = b
+
+    def value(self, X: np.ndarray) -> np.ndarray:
+        return self._c * (X + self._b)
+
+    def _derivative(self, X: np.ndarray) -> np.ndarray:
+        return np.full_like(X, self._c)  # Derivative of a linear function is constant (c)
+
+    def __repr__(self) -> str:
+        return "Identity"
+
+# used for any hidden layer in a neural network 
 class Sigmoid:
     def __init__(self, c: float = 1, b: float= 0) -> None:
         self._c = c

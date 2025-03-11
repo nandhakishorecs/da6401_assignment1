@@ -6,9 +6,8 @@ from layers import Dense, Input
 from data_handling import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 # from sklearn import metrics
-import tensorflow as tf
 
-[(train_X, train_y), (test_X, test_y)] = tf.keras.datasets.fashion_mnist.load_data()
+[(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
 train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.2, random_state=42)
 
 # Number of Unique classes 
