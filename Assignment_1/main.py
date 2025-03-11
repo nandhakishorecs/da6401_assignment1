@@ -59,7 +59,7 @@ if __name__ == '__main__':
     model = NeuralNetwork(
         layers = layers, 
         batch_size = 4096, 
-        optimiser = 'eve', 
+        optimiser = 'sgd', 
         initialisation = 'random', 
         loss_function = 'cross_entropy', 
         # loss_function = 'mean_squared_error',
@@ -73,10 +73,9 @@ if __name__ == '__main__':
         val_target = onehot_val_y, 
         optimised_parameters = None, 
         wandb_log = False, 
-        verbose = False
+        verbose = True
     )
 
-<<<<<<< HEAD
     test = scaled_test_X
     # print(test.shape)
     # print(len(test))
@@ -95,25 +94,3 @@ if __name__ == '__main__':
 
     model._check(scaled_test_X, onehot_test_y)
     # print(model)
-=======
-    print(model)
-
-    test = scaled_test_X
-    # print(test.shape)
-    # print(len(test))
-
-    model.forward_propagation()
-    model.backward_propagation()
-
-    # predictions - yet to be implemented
-    pred_y = model.predict(test_X = test)
-    print(pred_y)
-
-    metrics = Metrics()
-
-    accuracy = metrics.accuracy_score(test_y, pred_y)
-    print(f'Accuracy:\t{accuracy}')
-
-    model._check(scaled_test_X, onehot_test_y)
-    
->>>>>>> 8e49c6c63336dcb94e41e45575e044026eba1d8b
