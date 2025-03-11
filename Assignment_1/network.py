@@ -127,8 +127,33 @@ class NeuralNetwork:
                 layer._W = HeInit().initialize(layer_size = layer._W_size) 
                 layer._b = np.zeros((layer._W_size[0], 1))
 
-    def __repr__(self) -> str: 
-        return f'\nNeural Network:\n\tNumber of layers:\t {len(self._layers)},\n\tLayers:\t{self._layers},\n\tOptimiser:\t\t{self._optimiser},\n\tInitialisation:\t\t{self._initialisation},\n\tEpochs:\t\t\t{self._n_epochs},\n\tBatch Size:\t\t{self._batch_size},\n\tLoss Function:\t\t{self._loss_function},\n\tLearning Rate:\t\t{self._lr},\n\tWeight Decay:\t\t{self._weight_decay},\n\tOptimised Parameters:\t{self._optimised_parameters}\n'
+    # def __repr__(self) -> str: 
+    #     return f'''
+    #     Neural Network:
+    #     Number of layers:\t {len(self._layers)},
+    #     Layers: {self._layers},
+    #     Optimiser:\t\t\t{map_optimiser[self._optimiser].__name__},
+    #     Initialisation:\t\t{map_initialiser[self._initialisation]},
+    #     Epochs:\t\t\t{self._n_epochs},
+    #     Batch Size:\t\t\t{self._batch_size},
+    #     Loss Function:\t\t{self._loss_function},
+    #     Learning Rate:\t\t{self._lr},
+    #     Weight Decay:\t\t{self._weight_decay},
+    #     Optimised Parameters:\t{self._optimised_parameters}
+    #     '''
+    def __repr__(self) -> str:
+        return f'''Neural Network:
+        Number of layers:     {len(self._layers)}
+        Layers:               {self._layers}
+        Optimiser:            {map_optimiser[self._optimiser].__name__}
+        Initialisation:       {map_initialiser[self._initialisation]}
+        Epochs:               {self._n_epochs}
+        Batch Size:           {self._batch_size}
+        Loss Function:        {self._loss_function}
+        Learning Rate:        {self._lr}
+        Weight Decay:         {self._weight_decay}
+        Optimised Parameters: {self._optimised_parameters}'''
+
     
     def forward_propagation(self) -> None:
         for i in range(1, len(self._layers)): 
@@ -160,7 +185,7 @@ class NeuralNetwork:
         val_loss_log = []
         val_accuracy_log = []
 
-        self._loss_function = MeanSquaredError()
+        # self._loss_function = MeanSquaredError()
         flag = False
 
         for epoch in tqdm(range(self._n_epochs)):
