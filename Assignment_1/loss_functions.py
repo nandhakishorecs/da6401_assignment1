@@ -19,7 +19,7 @@ class CategoricalCrossEntropy:
         return (-1) * y_true / y_pred
         
     def __repr__(self) -> str:
-        return "CategoricalCrossEntropy"
+        return 'Categorical Cross Entropy'
 
 # Used for regression
 class MeanSquaredError:
@@ -33,4 +33,4 @@ class MeanSquaredError:
         return -1 * (y_true - y_pred) 
     
     def __repr__(self) -> str:
-        return "MeanSquaredError"
+        return 'Mean Squared Error'

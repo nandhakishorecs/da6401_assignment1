@@ -1,6 +1,6 @@
 # This file is to check if the required packages are installed and working properly. Do no run it
 
-import tensorflow as tf 
+import tensorflow as tf  # type: ignore
 import numpy as np 
 import wandb 
 import keras 

@@ -62,18 +62,21 @@ if __name__ == '__main__':
         optimiser = 'eve', 
         initialisation = 'random', 
         loss_function = 'cross_entropy', 
+        # loss_function = 'mean_squared_error',
         n_epochs = 4,
-        target = onehot_train_y,
         learning_rate = 1e-2, 
+        weight_decay = 0.0005,
+        
+        target = onehot_train_y,
         validation = True, 
         val_X = scaled_val_X, 
         val_target = onehot_val_y, 
         optimised_parameters = None, 
-        weight_decay = 0.0005,
         wandb_log = False, 
-        verbose = True
+        verbose = False
     )
 
+<<<<<<< HEAD
     test = scaled_test_X
     # print(test.shape)
     # print(len(test))
@@ -92,3 +95,25 @@ if __name__ == '__main__':
 
     model._check(scaled_test_X, onehot_test_y)
     # print(model)
+=======
+    print(model)
+
+    test = scaled_test_X
+    # print(test.shape)
+    # print(len(test))
+
+    model.forward_propagation()
+    model.backward_propagation()
+
+    # predictions - yet to be implemented
+    pred_y = model.predict(test_X = test)
+    print(pred_y)
+
+    metrics = Metrics()
+
+    accuracy = metrics.accuracy_score(test_y, pred_y)
+    print(f'Accuracy:\t{accuracy}')
+
+    model._check(scaled_test_X, onehot_test_y)
+    
+>>>>>>> 8e49c6c63336dcb94e41e45575e044026eba1d8b
