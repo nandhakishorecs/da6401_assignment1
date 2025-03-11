@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow as tf # type: ignore
 from network import * 
 # from network_backup import *
 from sklearn.model_selection import train_test_split
@@ -47,7 +47,6 @@ if __name__ == '__main__':
         Dense(name = 'Hidden Layer 2', layer_size = 32, activation = 'Sigmoid'),
         Dense(name = 'Last_Layer', layer_size = 10) #, activation = 'Softmax')
     ]
-    print(layers)
     model = NeuralNetwork(
         layers = layers, 
         batch_size = 1024, 
@@ -60,29 +59,31 @@ if __name__ == '__main__':
         validation = True, 
         val_X = scaled_val_X, 
         val_target = onehot_val_y, 
-        optimised_parameters = None, 
+        
         weight_decay = 0.0005,
         wandb_log = False, 
         verbose = True
     )
 
+    print(model)
+    
     test = scaled_test_X
     # print(test.shape)
     # print(len(test))
 
-    model.forward_propagation()
-    model.backward_propagation()
+    # model.forward_propagation()
+    # model.backward_propagation()
 
-    # predictions - yet to be implemented
-    pred_y = model.predict(test_X = test)
-    print(pred_y)
+    # # predictions - yet to be implemented
+    # pred_y = model.predict(test_X = test)
+    # print(pred_y)
 
-    # metrics = Metrics()
-    from sklearn import metrics
-    # metrics = sklearn.metrics()
-    # accuracy = np.sum(test_y == pred_y)
-    accuracy = metrics.accuracy_score(test_y, pred_y)
-    print(f'Accuracy:\t{accuracy}')
+    # # metrics = Metrics()
+    # from sklearn import metrics
+    # # metrics = sklearn.metrics()
+    # # accuracy = np.sum(test_y == pred_y)
+    # accuracy = metrics.accuracy_score(test_y, pred_y)
+    # print(f'Accuracy:\t{accuracy}')
 
-    # train_acc, val_acc = model._get_accuracy()
-    # print(f'Accuracy:\t{train_acc} and {val_acc}')
+    # # train_acc, val_acc = model._get_accuracy()
+    # # print(f'Accuracy:\t{train_acc} and {val_acc}')

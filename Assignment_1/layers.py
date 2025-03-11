@@ -47,7 +47,9 @@ class Dense:
 
     def __repr__(self) -> str:
         if(self._name == 'Last_Layer'):
-            return f'''\n\t\tLayer name: {self._name} | Dense layer | Size: {self._size} | Activation: Softmax'''
-        return f'''\n\t\tLayer name: {self._name} | Dense Layer | Size: {self._size} | Activation: {self._activation}'''
+            return f'''
+        \t\tLayer name: {self._name} | Dense layer | Size: {self._size} | Activation: Softmax'''
+        return f'''
+        \t\tLayer name: {self._name} | Dense Layer | Size: {self._size} | Activation: {self._activation}'''
     
 # COMPLETED

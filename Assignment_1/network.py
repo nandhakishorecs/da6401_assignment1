@@ -13,11 +13,35 @@ from layers import *
 # from metrics import *
 # from sklearn import metrics
 
-# ------------------- A Complete Neural Network ----------------------------
+# ------------------- A Complete Neural Network ------------------------------------------------------------------------------------
 #   Author: Nandhakishore C S 
 #   Roll Number: DA24M011
 #   Submitted as part of DA6401 Introduction to Deep Learning Assignment 1
-# --------------------------------------------------------------------------
+#
+#   This file contains the code for implementing a artificial neural netwrok from scratch with numpy and math libraries in Python
+#   This file uses activation functions, optimisers, loss functions, layers and initialisers from other Python files. 
+#   
+#   Description of the function in the class NeuralNetwork: 
+#       - _init_parameters (self): 
+#           * initialises the weights and biases of a neural network with the given initialisation 
+#
+#       - forward_propagation (self): 
+#           * does a complete forward sweep and gives out the logits for the classes 
+#           * takes the functions from actiavtions, optimisers, layeres and initialisers
+#       
+#       - backward_propagation (self): 
+#           * computes gradient and updates the parameters using the optimiser function 
+#           * takes the functions from actiavtions, optimisers, layeres and initialisers
+#
+#       - _get_accuracy(true, predicted): 
+#           * private function, to calculate accuracy for validation and training - used for logging 
+#
+#       - _check(data):
+#           * private function, to check for loss values for debugging 
+#
+#       - __repr__
+#           * python magic function to describe the neural network, print the class to use it. 
+# ----------------------------------------------------------------------------------------------------------------------------------
 
 # optimiser map 
 map_optimiser = {
@@ -53,7 +77,7 @@ encoder = OneHotEncoder()
 
 # Basic skeleton 
 class NeuralNetwork: 
-    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, verbose: bool = False, weight_decay: float = 0, optimised_parameters = None) -> None: 
+    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, verbose: bool = False, weight_decay: float = 0) -> None: 
         self._layers = layers
         self._batch_size = batch_size
         self._initialisation = initialisation
@@ -66,7 +90,6 @@ class NeuralNetwork:
         self._log = wandb_log
         self._verbose = verbose
         self._validation = validation
-        self._optimised_parameters = optimised_parameters
         self._weight_decay = weight_decay
         self._lr = learning_rate
         if(self._validation):
@@ -100,6 +123,18 @@ class NeuralNetwork:
             for layer in self._layers[1: ]: 
                 layer._W = HeInit().initialize(layer_size = layer._W_size) 
                 layer._b = np.zeros((layer._W_size[0], 1))
+
+    def __repr__(self) -> str:
+        return f'''Neural Network:
+    Number of layers : {len(self._layers)}
+    Layers           : {self._layers}
+    Optimiser        : {map_optimiser[self._optimiser].__name__}
+    Initialisation   : {map_initialiser[self._initialisation]}
+    Epochs           : {self._n_epochs}
+    Batch Size       : {self._batch_size}
+    Loss Function    : {self._loss_function}
+    Learning Rate    : {self._lr}
+    Weight Decay     : {self._weight_decay}'''
     
     def forward_propagation(self) -> None:
         for i in range(1, len(self._layers)): 
