@@ -1,4 +1,4 @@
-import keras
+import tensorflow as tf
 from network import * 
 # from network_backup import *
 from sklearn.model_selection import train_test_split
@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 # python3.9 -m pip install -r requirements.txt
 if __name__ == '__main__':
     # -------------------------------- Dataset Loading --------------------------------
-    [(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
+    [(train_X, train_y), (test_X, test_y)] = tf.keras.datasets.fashion_mnist.load_data()
     train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.2, random_state=2)
 
     # Number of Unique classes 
@@ -43,35 +43,25 @@ if __name__ == '__main__':
     # Start with any number of inputs and end with 10 (we have 10 classes)
     layers = [
         Input(input_data = scaled_train_X),
-        Dense(name = 'Hidden Layer 1', layer_size = 32, activation = 'Identity'),
+        Dense(name = 'Hidden Layer 1', layer_size = 32, activation = 'Sigmoid'),
+        Dense(name = 'Hidden Layer 2', layer_size = 32, activation = 'Sigmoid'),
         Dense(name = 'Last_Layer', layer_size = 10) #, activation = 'Softmax')
     ]
-
-    # 'sgd' : GradientDescent,
-    # 'momentum' : MomentumGD, 
-    # 'nag': NesterovMomentumGD, 
-    # 'adagrad': AdaGrad, 
-    # 'rmsprop': RMSProp,
-    # 'adadelta': AdaDelta,
-    # 'adam': Adam, 
-    # 'nadam': Nadam, 
-    # 'eve': Eve
+    print(layers)
     model = NeuralNetwork(
         layers = layers, 
-        batch_size = 4096, 
-        optimiser = 'sgd', 
-        initialisation = 'random', 
-        loss_function = 'cross_entropy', 
-        # loss_function = 'mean_squared_error',
-        n_epochs = 4,
-        learning_rate = 1e-2, 
-        weight_decay = 0.0005,
-        
+        batch_size = 1024, 
+        optimiser = 'Adam', 
+        initialisation = 'RandomInit', 
+        loss_function = 'CategoricalCrossEntropy', 
+        n_epochs = 5,
         target = onehot_train_y,
+        learning_rate = 1e-3, 
         validation = True, 
         val_X = scaled_val_X, 
         val_target = onehot_val_y, 
         optimised_parameters = None, 
+        weight_decay = 0.0005,
         wandb_log = False, 
         verbose = True
     )
@@ -87,10 +77,12 @@ if __name__ == '__main__':
     pred_y = model.predict(test_X = test)
     print(pred_y)
 
-    metrics = Metrics()
-
+    # metrics = Metrics()
+    from sklearn import metrics
+    # metrics = sklearn.metrics()
+    # accuracy = np.sum(test_y == pred_y)
     accuracy = metrics.accuracy_score(test_y, pred_y)
     print(f'Accuracy:\t{accuracy}')
 
-    model._check(scaled_test_X, onehot_test_y)
-    # print(model)
+    # train_acc, val_acc = model._get_accuracy()
+    # print(f'Accuracy:\t{train_acc} and {val_acc}')
