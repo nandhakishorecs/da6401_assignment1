@@ -74,21 +74,21 @@ if __name__ == '__main__':
         verbose = True
     )
 
-    # test = scaled_test_X
-    # # print(test.shape)
-    # # print(len(test))
+    test = scaled_test_X
+    # print(test.shape)
+    # print(len(test))
 
-    # model.forward_propagation()
-    # model.backward_propagation()
+    model.forward_propagation()
+    model.backward_propagation()
 
-    # # predictions - yet to be implemented
-    # pred_y = model.predict(test_X = test)
-    # print(pred_y)
+    # predictions - yet to be implemented
+    pred_y = model.predict(test_X = test)
+    print(pred_y)
 
-    # metrics = Metrics()
+    metrics = Metrics()
 
-    # accuracy = metrics.accuracy_score(test_y, pred_y)
-    # print(f'Accuracy:\t{accuracy}')
+    accuracy = metrics.accuracy_score(test_y, pred_y)
+    print(f'Accuracy:\t{accuracy}')
 
-    # model._check(scaled_test_X, onehot_test_y)
-    print(model)
+    model._check(scaled_test_X, onehot_test_y)
+    # print(model)
