@@ -1,11 +1,11 @@
 import wandb
 import keras
 import numpy as np
-from network import NeuralNetwork  # Assuming your neural network class is in neural_network.py
+from network import NeuralNetwork  
 from layers import Dense, Input
 from data_handling import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
-# from sklearn import metrics
+
 
 [(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
 train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.2, random_state=42)
@@ -95,12 +95,10 @@ def train_sweep():
         val_X=scaled_val_X,
         val_target=val_y,
         wandb_log=True,
-        verbose=False,
     )
     
     # Train the model
-    model.forward_propagation()
-    model.backward_propagation()
+    model.fit()
     
     wandb.finish()
 

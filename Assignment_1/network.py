@@ -1,18 +1,3 @@
-import math
-import numpy as np
-import wandb
-from tqdm import tqdm
-from copy import deepcopy
-
-from initialisers import *
-from activations import *
-from loss_functions import *
-from data_handling import *
-from optimisers import *
-from layers import *
-# from metrics import *
-# from sklearn import metrics
-
 # ------------------- A Complete Neural Network ------------------------------------------------------------------------------------
 #   Author: Nandhakishore C S 
 #   Roll Number: DA24M011
@@ -28,7 +13,7 @@ from layers import *
 #       - forward_propagation (self): 
 #           * does a complete forward sweep and gives out the logits for the classes 
 #           * takes the functions from actiavtions, optimisers, layeres and initialisers
-#       
+#
 #       - backward_propagation (self): 
 #           * computes gradient and updates the parameters using the optimiser function 
 #           * takes the functions from actiavtions, optimisers, layeres and initialisers
@@ -42,6 +27,22 @@ from layers import *
 #       - __repr__
 #           * python magic function to describe the neural network, print the class to use it. 
 # ----------------------------------------------------------------------------------------------------------------------------------
+
+import math
+import numpy as np
+import wandb
+from tqdm import tqdm
+from copy import deepcopy
+
+
+from initialisers import *
+from activations import *
+from loss_functions import *
+from data_handling import *
+from optimisers import *
+from layers import *
+from metrics import *
+# from sklearn import metrics
 
 # optimiser map 
 map_optimiser = {
@@ -77,7 +78,8 @@ encoder = OneHotEncoder()
 
 # Basic skeleton 
 class NeuralNetwork: 
-    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, verbose: bool = False, weight_decay: float = 0) -> None: 
+    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, weight_decay: float = 0, name: str = 'My Model') -> None: 
+        self._name = name
         self._layers = layers
         self._batch_size = batch_size
         self._initialisation = initialisation
@@ -88,7 +90,6 @@ class NeuralNetwork:
         self._loss_type = loss_function
         self._loss_function = map_loss_function[loss_function]
         self._log = wandb_log
-        self._verbose = verbose
         self._validation = validation
         self._weight_decay = weight_decay
         self._lr = learning_rate
@@ -125,39 +126,44 @@ class NeuralNetwork:
                 layer._b = np.zeros((layer._W_size[0], 1))
 
     def __repr__(self) -> str:
-        return f'''Neural Network:
-    Number of layers : {len(self._layers)}
-    Layers           : {self._layers}
-    Optimiser        : {map_optimiser[self._optimiser].__name__}
-    Initialisation   : {map_initialiser[self._initialisation]}
-    Epochs           : {self._n_epochs}
-    Batch Size       : {self._batch_size}
-    Loss Function    : {self._loss_function}
-    Learning Rate    : {self._lr}
-    Weight Decay     : {self._weight_decay}'''
+        return f'''\033[1;32mNeural Network:\033[0m
+    \033[1;36mName\033[0m              : {self._name}    
+    \033[1;36mNumber of layers\033[0m  : {len(self._layers)}
+    \033[1;36mLayers\033[0m            : {self._layers}
+    \033[1;36mOptimiser\033[0m         : {map_optimiser[self._optimiser].__name__}
+    \033[1;36mInitialisation\033[0m    : {map_initialiser[self._initialisation]}
+    \033[1;36mEpochs\033[0m            : {self._n_epochs}
+    \033[1;36mBatch Size\033[0m        : {self._batch_size}
+    \033[1;36mLoss Function\033[0m     : {self._loss_function}
+    \033[1;36mLearning Rate\033[0m     : {self._lr}
+    \033[1;36mWeight Decay\033[0m      : {self._weight_decay}
+    \033[1;36mValidation\033[0m        : {self._validation}
+    '''
+
     
-    def forward_propagation(self) -> None:
+    def _forward_propagation(self) -> None:
         for i in range(1, len(self._layers)): 
             # # testing
             # if np.isnan(self._layers[i]._h).any():
             #     print(f"NaN detected in h at Layer {i}")
-
-            # # testing
             # if np.isnan(self._layers[i]._a).any():
             #     print(f"NaN detected in activations at Layer {i}")
             self._layers[i]._h = self._layers[i]._W @ self._layers[i-1]._a - self._layers[i]._b
             self._layers[i]._a = self._layers[i]._activation.value(self._layers[i]._h)
-            self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
-            self._layers[i]._a_val = self._layers[i]._activation.value(self._layers[i]._h_val)
+            if(self._validation):
+                self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
+                self._layers[i]._a_val = self._layers[i]._activation.value(self._layers[i]._h_val)
         
         if(self._loss_type == 'CategoricalCrossEntropy'):
             self._layers[-1]._y = Softmax().value(self._layers[-1]._a)
-            self._layers[-1]._y_val = Softmax().value(self._layers[-1]._a_val)
+            if(self._validation):
+                self._layers[-1]._y_val = Softmax().value(self._layers[-1]._a_val)
         else: 
             self._layers[-1]._y = self._layers[-1]._a
-            self._layers[-1]._y_val = self._layers[-1]._a_val
+            if(self._validation):
+                self._layers[-1]._y_val = self._layers[-1]._a_val
 
-    def backward_propagation(self) -> None: 
+    def _backward_propagation(self) -> None: 
         # Logging locally 
         lr_log = [] 
         train_loss_log = []
@@ -167,18 +173,43 @@ class NeuralNetwork:
         val_accuracy_log = []
 
         self._loss_function = MeanSquaredError()
-        flag = False
 
-        for epoch in tqdm(range(self._n_epochs)):
+        progress_bar = tqdm(
+            range(self._n_epochs), 
+            # desc = '\033[1;32mTraining\033[0m', 
+            unit = 'epoch', 
+            ncols = 100, 
+            colour = 'white',
+            dynamic_ncols = True
+        )
+        tqdm.write('\033[1;32mTraining\033[0m')
+        for epoch in progress_bar:
             # Logging locally
-            lr_log.append(self._layers[-1]._W_optimiser._lr)
             
-            train_loss_log.append(self._loss_function.value(self._target, self._layers[-1]._y))
-            val_loss_log.append(self._loss_function.value(self._val_target, self._layers[-1]._y_val))
-        
-            training_accuracy, validation_accuracy = self._get_accuracy()
-            train_accuracy_log.append(training_accuracy)
-            val_accuracy_log.append(validation_accuracy)
+            lr_log.append(self._layers[-1]._W_optimiser._lr)
+
+            if(self._validation):
+                training_accuracy, validation_accuracy = self._get_accuracy()
+                train_loss_log.append(self._loss_function.value(self._target, self._layers[-1]._y))
+                train_accuracy_log.append(training_accuracy)
+                val_loss_log.append(self._loss_function.value(self._val_target, self._layers[-1]._y_val))
+                val_accuracy_log.append(validation_accuracy)
+                progress_bar.set_postfix({
+                    # "\033[1;31mRed\033[0m"
+                    'Train Acc': f'\033[1;32m{train_accuracy_log[-1]:.2f}\033[0m',
+                    'Val Acc': f'\033[1;32m{val_accuracy_log[-1]:.2f}\033[0m',
+                    'Train Loss': f'\033[1;31m{train_loss_log[-1] / self._target.shape[1]:.2f}\033[0m',
+                    'Val Loss': f'\033[1;31m{val_loss_log[-1] / self._val_target.shape[1]:.2f}\033[0m',
+                })
+
+            elif(self._validation is False): 
+                training_accuracy = self._get_accuracy()
+                train_loss_log.append(self._loss_function.value(self._target, self._layers[-1]._y))
+                train_accuracy_log.append(training_accuracy)
+                progress_bar.set_postfix({
+                    'Train Acc': f'\033[1;32m{train_accuracy_log[-1]:.2f}\033[0m',
+                    'Train Loss': f'\033[1;31m{train_loss_log[-1] / self._target.shape[1]:.2f}\033[0m'
+                })
 
             if(self._log): 
                 # Wandb logging 
@@ -197,9 +228,6 @@ class NeuralNetwork:
                 
                 self._target_batch = target_batch
                 self._y_batch = y_batch
-
-                if(flag): 
-                    break
 
                 # Compute gradient for output layer
                 self._layers[-1]._a_grad = self._loss_function.derivative(self._target_batch, self._y_batch) 
@@ -230,40 +258,35 @@ class NeuralNetwork:
                     layer._W -= layer._W_update + (self._weight_decay * layer._W)
                     layer._b -= layer._b_update
                     
-                self.forward_propagation()
-
+                self._forward_propagation()
+        
+            # for debugging
             # print('w update',self._layers[-1]._W_update)
             # print('w grad',self._layers[-1]._W_grad)
             # print('b update',self._layers[-1]._b_update)
-            if(flag): 
-                break
+        print()
+
+    def fit(self): 
+        self._forward_propagation()
+        self._backward_propagation()
 
     def _get_accuracy(self):    # Returns tuple when validation, else returns a single float 
         train_t = encoder.inverse_transform(self._target)
-        # train_t = np.argmax(train_t, axis = 0)
         train_y = encoder.inverse_transform(self._layers[-1]._y)
-        # train_y = np.argmax(train_y, axis = 0)
+        
         from sklearn import metrics
         training_accuracy = metrics.accuracy_score(train_t, train_y)
-        # training_accuracy = np.sum(train_t == train_y)
+        
         if(self._validation): 
             val_t = encoder.inverse_transform(self._val_target)
-            # val_t = np.argmax(val_t, axis = 0)
             val_y = encoder.inverse_transform(self._layers[-1]._y_val)
-            # val_y = np.argmax(val_y, axis = 0)
 
             validation_accuracy = metrics.accuracy_score(val_t, val_y) 
-            # validation_accuracy = np.sum(val_t == val_y)
-
-            if(self._verbose):
-                print(f'Training accuracy: {training_accuracy}\tValidation accuracy: {validation_accuracy}')
             return training_accuracy, validation_accuracy
         
-        if(self._verbose):
-            print(f'Training accuracy:\t{training_accuracy}')
-
         return training_accuracy
     
+    # method to do inference 
     def predict(self, test_X: np.ndarray) -> np.ndarray: 
         a = test_X
         for i in range(1, len(self._layers)): 
@@ -274,8 +297,7 @@ class NeuralNetwork:
             pred_y = Softmax().value(a)
         else: 
             pred_y = a
-        
-        # y = encoder.inverse_transform(pred_y)
+
         return np.argmax(pred_y, axis = 0)
 
     # used for debugging

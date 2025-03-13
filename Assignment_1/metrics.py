@@ -40,7 +40,7 @@ class Metrics:
 		matrix = np.zeros((len(labels), len(labels)), dtype=int)
 		label_to_index = {label: index for index, label in enumerate(labels)}
 		for true, predection in zip(y_true, y_pred):
-			matrix[label_to_index[true]][label_to_index[predection]] += 1
+				matrix[label_to_index[true]][label_to_index[predection]] += 1
 		return matrix
 
 	# ------------------- Calculating Precision, Recal and F1 Score with the Confusion matrix -----------
