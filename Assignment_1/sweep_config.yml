@@ -1,0 +1,24 @@
+name: complete_sweep_1
+method: bayes
+metric:
+  name: Validation_Accuracy
+  goal: maximize
+parameters:
+  activation:
+    values: ['Sigmoid', 'ReLU', 'Tanh']
+  layer_size:
+    values: [32, 64, 128]
+  n_layers:
+    values: [3, 4, 5]
+  learning_rate:
+    values: [0.01, 0.001, 0.0001]
+  batch_size:
+    values: [32, 64, 128, 512, 1024]
+  optimiser:
+    values: ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']
+  n_epochs:
+    values: [10, 20]
+  initialisation:
+    values: ['RandomInit', 'XavierInit', 'HeInit']
+  weight_decay:
+    values: [0, 0.0005, 0.5]

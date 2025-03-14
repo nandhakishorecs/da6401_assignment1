@@ -13,8 +13,9 @@ train_X, val_X, train_y, val_y = train_test_split(train_X, train_y, test_size=0.
 # Number of Unique classes 
 n_classes = len(np.unique(test_y))
 
-print("Size of Training data:", train_X.shape)
-print("Size of Validation data:", val_X.shape)
+# logging
+# print("Size of Training data:", train_X.shape)
+# print("Size of Validation data:", val_X.shape)
 
 # scaling data
 scaler = MinMaxScaler() 
@@ -37,25 +38,29 @@ train_y = encoder.fit_transform(y = train_y, n_class = 10)
 val_y = encoder.fit_transform(y = val_y, n_class = 10)
 test_y = encoder.fit_transform(y = test_y, n_class = 10)
 
+import yaml
+
+with open("sweep_config.yml", "r") as file:
+    sweep_config = yaml.safe_load(file)
 
 # Define sweep configuration
-sweep_config = {
-    'name': 'complete_sweep_1',
-    'method': 'bayes',  # use 'grid', 'random' or 'bayes' for different search methods
-    'metric': {'name': 'Validation_Accuracy', 'goal': 'maximize'},
-    'parameters': {
-        'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']}, 
-        'layer_size': {'values': [32, 64, 128]}, 
-        'n_layers': {'values': [3, 4, 5]},
-        'learning_rate': {'values': [1e-2, 1e-3, 1e-4]},
-        'batch_size': {'values': [32, 64, 128, 512, 1024]}, 
-        'optimiser': {'values': ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']},
-        'n_epochs': {'values': [10, 20]},
-        'initialisation': {'values': ['RandomInit', 'XavierInit', 'HeInit']}, # 
-        'weight_decay': {'values': [0, 0.0005, 0.5]}
-        # 'loss_function': {'values': ['CategoricalCrossEntropy', 'MeanSquaredError']}
-    }
-}
+# sweep_config = {
+#     'name': 'complete_sweep_1',
+#     'method': 'bayes',  # use 'grid', 'random' or 'bayes' for different search methods
+#     'metric': {'name': 'Validation_Accuracy', 'goal': 'maximize'},
+#     'parameters': {
+#         'activation': {'values': ['Sigmoid', 'ReLU', 'Tanh']}, 
+#         'layer_size': {'values': [32, 64, 128]}, 
+#         'n_layers': {'values': [3, 4, 5]},
+#         'learning_rate': {'values': [1e-2, 1e-3, 1e-4]},
+#         'batch_size': {'values': [32, 64, 128, 512, 1024]}, 
+#         'optimiser': {'values': ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']},
+#         'n_epochs': {'values': [10, 20]},
+#         'initialisation': {'values': ['RandomInit', 'XavierInit', 'HeInit']}, # 
+#         'weight_decay': {'values': [0, 0.0005, 0.5]}
+#         # 'loss_function': {'values': ['CategoricalCrossEntropy', 'MeanSquaredError']}
+#     }
+# }
 
 sweep_id = wandb.sweep(sweep_config,project='da6401_assignment1')  # project name 
 
@@ -103,4 +108,4 @@ def train_sweep():
     wandb.finish()
 
 # Run sweep
-wandb.agent(sweep_id, function=train_sweep, count=120)
+wandb.agent(sweep_id, function=train_sweep, count=1)

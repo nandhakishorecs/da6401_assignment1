@@ -8,6 +8,11 @@ from metrics import Metrics
 import warnings
 warnings.filterwarnings("ignore")
 
+map_datasets = {
+    "mnist": tf.datasets.MNIST, 
+    "fashion_mnist": tf.datasets.FashionMNIST
+}
+
 # python3.9 -m pip install -r requirements.txt
 if __name__ == '__main__':
     # wandb initialisation
