@@ -34,7 +34,6 @@ import wandb
 from tqdm import tqdm
 from copy import deepcopy
 
-
 from initialisers import *
 from activations import *
 from loss_functions import *
@@ -299,6 +298,18 @@ class NeuralNetwork:
             pred_y = a
 
         return np.argmax(pred_y, axis = 0)
+
+    # Displaying the weights of the Model
+    @property
+    def parameters(self) -> None: 
+        print('\nWeights in the neural network\n')
+        for layer in self._layers[1: ]: 
+            print(layer._W)
+
+        print('\nBiases in the neural network\n')
+        for layer in self._layers[1: ]: 
+            print(layer._b)
+
 
     # used for debugging
     def log(self, test_X: np.ndarray, test_t: np.ndarray): 

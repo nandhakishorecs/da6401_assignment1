@@ -8,10 +8,10 @@ from metrics import Metrics
 import warnings
 warnings.filterwarnings("ignore")
 
-map_datasets = {
-    "mnist": tf.datasets.MNIST, 
-    "fashion_mnist": tf.datasets.FashionMNIST
-}
+# map_datasets = {
+#     "mnist": tf.keras.datasets.mnist, 
+#     "fashion_mnist": tf.keras.datasets.Fashion
+# }
 
 # python3.9 -m pip install -r requirements.txt
 if __name__ == '__main__':
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         initialisation = 'HeInit', 
         learning_rate = 1e-2, 
         weight_decay = 0.0005,
-        n_epochs = 5,
+        n_epochs = 1,
         loss_function = 'CategoricalCrossEntropy', 
         target = onehot_train_y,
         validation = True, 
@@ -107,6 +107,8 @@ if __name__ == '__main__':
     
     # Train model for the given configuration 
     model.fit()
+
+    model.parameters()
     
     # metrics = Metrics()
 
