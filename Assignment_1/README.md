@@ -93,3 +93,48 @@ When categorical cross entropy loss is replaced by mean squared error loss, the 
 
 ## Question 9
 This repository contains the complete code for Assignment 1 in prescribed format. 
+
+## Question 10
+For MNIST dataset, the folowing three configurations were tried and the details are as follows: 
+
+1.  **Validation Accuracy**          : 0.8798333333333334 \
+    **Training Accuracy**            : 0.9159166666666668   \
+    **Actiavtion Function**          : Tanh \
+    **Batch Size**                   : 32                 
+    **Initialisation**               : Xavier   \
+    **Number of Neurons in a Layer** : 64  \
+    **Number of Layers**             : 4    \
+    **Learning Rate**                : 0.001    \
+    **Number of epochs**             : 20   \
+    **Weight Decay**                 : 0    \
+    **Optimiser**                    : Nadam    
+
+2.  **Validation Accuracy**          : 0.8770833333333333   \
+    **Training Accuracy**            : 0.904375  \
+    **Actiavtion Function**          : Tanh \
+    **Batch Size**                   : 32
+    **Initialisation**               : He   
+    **Number of Neurons in a Layer** : 64  \
+    **Number of Layers**             : 5    \
+    **Learning Rate**                : 0.0001    \
+    **Number of epochs**             : 20   \
+    **Weight Decay**                 : 0    \
+    **Optimiser**                    : Nadam     
+
+3.  **Validation Accuracy**          : 0.8565\
+    **Training Accuracy**            : 0.90925\
+    **Actiavtion Function**          : Sigmoid  \
+    **Batch Size**                   : 32            
+    **Initialisation**               : Random   \
+    **Number of Neurons in a Layer** : 128  \
+    **Number of Layers**             : 5    \
+    **Learning Rate**                : 0.001    \
+    **Number of epochs**             : 20   \
+    **Weight Decay**                 : 0    \
+    **Optimiser**               : Eve    
+
+MNIST and Fashion MNIST datasets share a lot of common structure: 
+- both the datasets have 10 classess and same number of samples. 
+- both datasets have images of size (28 $\times$ 28) and they are greyscale. 
+- All of these images are low on resolution 
+- With efficient optimisers, and corrcted batch size, we can get good accuracies. (Reason: MNIST had numerical digits written in a 28 $\times$ 28 canvas and thus the numbers occupy a small space in the canvas, mostly positioned at the center; whereas, fashion_mnist has data which is spread across the $28 \times 28$ canvas)
