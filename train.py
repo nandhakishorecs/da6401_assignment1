@@ -15,24 +15,24 @@ def get_args():
     parser.add_argument('-d', '--dataset', type = str, default = 'fashion_mnist', choices = ['mnist', 'fashion_mnist'], help = 'Dataset to use')
     
     # Neural netwrok architecture 
-    parser.add_argument('-sz', '--layer_size', type = int, default = 512, help = 'Number of neurons in hidden layer')
-    parser.add_argument('-nh1', '--hidden_layers', type = int, default = 3, help = 'Number of hidden layers')
-    parser.add_argument('-e', '--epochs', type = int, default = 10, help = 'Number of epochs')
+    parser.add_argument('-sz', '--layer_size', type = int, default = 4, help = 'Number of neurons in hidden layer')
+    parser.add_argument('-nh1', '--hidden_layers', type = int, default = 4, help = 'Number of hidden layers')
+    parser.add_argument('-e', '--epochs', type = int, default = 1, help = 'Number of epochs')
     
     # layer parameters 
     parser.add_argument('-a', '--activation', type = str, default = 'sigmoid', choices=['identity', 'sigmoid', 'relu', 'tanh'], help = 'Activation function')
-    parser.add_argument('-bs', '--batch_size', type = int, default = 2048, help = 'Batch size')
+    parser.add_argument('-bs', '--batch_size', type = int, default = 4, help = 'Batch size')
     parser.add_argument('-w_d', '--weight_decay', type = float, default = 0, help = 'Weight decay')
     parser.add_argument('-w_i', '--initialisation', type = str, default = 'random', help = 'Parameter initialisation')
     
     # optimiser parameters
-    parser.add_argument('-lr', '--learning_rate', type = float, default = 1e-2, help = 'Learning rate')
+    parser.add_argument('-lr', '--learning_rate', type = float, default = 0.1, help = 'Learning rate')
     parser.add_argument('-o', '--optimiser', type = str, default = 'sgd', help = 'Optimiser')
-    parser.add_argument('-eps', '--epsilon', type = float, default = 1e-7 , help = 'Epsilon for adam, adagrad, rmsprop, nadam, eve optimiser')
-    parser.add_argument('-m', '--momentum', type = float, default = 0.9 , help = 'Momentum for nag, momentum optimiser')
-    parser.add_argument('-b', '--beta', type = float, default = 0.9 , help = 'Beta for RMSProp, AdaDelta optimiser')
-    parser.add_argument('-b1', '--beta1', type = float, default = 0.9 , help = 'Beta1 for Adam, Eve and Nadam')
-    parser.add_argument('-b2', '--beta2', type = float, default = 0.999 , help = 'Beta2 for Adam, Eve and Nadam')
+    parser.add_argument('-eps', '--epsilon', type = float, default = 1e-6 , help = 'Epsilon for adam, adagrad, rmsprop, nadam, eve optimiser')
+    parser.add_argument('-m', '--momentum', type = float, default = 0.5 , help = 'Momentum for nag, momentum optimiser')
+    parser.add_argument('-b', '--beta', type = float, default = 0.5 , help = 'Beta for RMSProp, AdaDelta optimiser')
+    parser.add_argument('-b1', '--beta1', type = float, default = 0.5 , help = 'Beta1 for Adam, Eve and Nadam')
+    parser.add_argument('-b2', '--beta2', type = float, default = 0.5 , help = 'Beta2 for Adam, Eve and Nadam')
     
     # model structure 
     parser.add_argument('-v', '--validation', type = bool, default = True, help = 'Use validation')
@@ -42,7 +42,7 @@ def get_args():
     parser.add_argument('-log', '--log', type = bool, default = False, help = 'Use wandb')
     parser.add_argument('-wp', '--wandb_project', type = str, default = 'da6401_assignment1', help = 'Use wandb')
     parser.add_argument('-we', '--wand_entity', type = str, default = 'trial1', help = 'Use wandb')
-    
+
     return parser.parse_args()
 
 # python3.9 -m pip install -r requirements.txt
