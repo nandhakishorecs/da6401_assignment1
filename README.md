@@ -173,6 +173,38 @@ MNIST and Fashion MNIST datasets share a lot of common structure:
 
 ## Code specifications: 
 
+This repository contains the complete code for Assignment 1 in prescribed format. 
+
+To test the code, download all the files in a same directory and run the following commands: <br>
+```console
+$ python3 train.py -d fashion_mnist -sz 128 -nh1 4 -a tanh  -o adam -lr 0.001 -beta1 0.9 -beta2 0.999 -eps 1e-7 -e 10 -bs 32 -w_d 0.0005 -w_i xavier -l cross_entropy -log True -v True
+```
+The details about command line arguements can be found below: <br>
+
+| Name | Default Value | Description |
+| :---: | :-------------: | :----------- |
+| `-wp`, `--wandb_project` | da6401_assignment1 | Project name used to track experiments in Weights & Biases dashboard |
+| `-we`, `--wandb_entity` | trial1  | Wandb Entity used to track experiments in the Weights & Biases dashboard. |
+| `-log`, `--log` | True  | Save wandb runs |
+| `-d`, `--dataset` | fashion_mnist | choices:  ["mnist", "fashion_mnist"] |
+| `-e`, `--epochs` | 1 |  Number of epochs to train neural network.|
+| `-bs`, `--batch_size` | 4 | Batch size used to train neural network. | 
+| `-l`, `--loss` | cross_entropy | choices:  ["mean_squared_error", "cross_entropy"] |
+| `-o`, `--optimizer` | sgd | choices:  ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"] | 
+| `-lr`, `--learning_rate` | 0.1 | Learning rate used to optimize model parameters | 
+| `-w_d`, `--weight_decay` | 0 | Weight decay used by optimizers. |
+| `-w_i`, `--initialisation` | random | choices:  ["random", "Xavier"] | 
+| `-nhl`, `--hidden_layers` | 1 | Number of hidden layers used in feedforward neural network. | 
+| `-sz`, `--hidden_size` | 4 | Number of hidden neurons in a feedforward layer. |
+| `-a`, `--activation` | sigmoid | choices:  ["identity", "sigmoid", "tanh", "ReLU"] |
+| `-v`, `--validation` | True | choices: [True, False] | 
+| `-m`, `--momentum` | 0.5 | Momentum for Momentum and NAG optimisers | 
+| `-b`, `--beta` | 0.5 | Beta for RMSProp and AdaDelta optimisers | 
+| `-b1`, `--beta1` | 0.5 | Beta1 for Adam, Eve, Nadam optimisers | 
+| `-b2`, `--beta2` | 0.5 | Beta2 for Adam, Eve, Nadam optimisers | 
+| `-eps`, `--epsilon` | 0.0000001 | Epsilon for Optimisers | 
+
+<br>
 
 
-Example: python3.9 train.py -d mnist -o adam -a tanh -sz 2048 -nh1 2 -b 2048 -e 5 -lr 0.01 -w_d 0.0005 -w_i he -v True -l cross_entropy -log True -wp da6401_assignment1 -we trial1
+**wandb report**: https://wandb.ai/da6401_assignments/da6401_assignment1/reports/DA6401-Assignment-1-Report--VmlldzoxMTgzOTEwNQ
