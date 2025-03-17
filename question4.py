@@ -94,7 +94,7 @@ def train_sweep():
         learning_rate=config.learning_rate,
         weight_decay=config.weight_decay,
         # default values 
-        loss_function='CategoricalCrossEntropy',
+        loss_function='cross_entropy',
         target=train_y,
         validation=True,
         val_X=scaled_val_X,

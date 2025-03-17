@@ -5,7 +5,7 @@ metric:
   goal: maximize
 parameters:
   activation:
-    values: ['Sigmoid', 'ReLU', 'Tanh']
+    values: ['sigmoid', 'relu', 'tanh']
   layer_size:
     values: [32, 64, 128]
   n_layers:
@@ -15,10 +15,10 @@ parameters:
   batch_size:
     values: [32, 64, 128, 512, 1024]
   optimiser:
-    values: ['SGD', 'Momentum_GD', 'Nestorov', 'RMSProp', 'Adam', 'Nadam', 'Eve']
+    values: ['sgd', 'momentum', 'nag', 'rmsprop', 'adam', 'nadam', 'eve']
   n_epochs:
     values: [10, 20]
   initialisation:
-    values: ['RandomInit', 'XavierInit', 'HeInit']
+    values: ['random', 'xavier', 'he']
   weight_decay:
     values: [0, 0.0005, 0.5]

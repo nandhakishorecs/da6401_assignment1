@@ -25,23 +25,22 @@ if __name__ == '__main__':
     print(np.unique(test_y))
     n_classes = len(np.unique(test_y))
     print(n_classes)
-    class_map = {
-        0 : "T-shirt/top", 
-        1 : "Trouser", 
-        2 : "Pullover",
-        3 : "Dress", 
-        4 : "Coat", 
-        5 : "Sandal", 
-        6 : "Shirt",
-        7 : "Sneaker", 
-        8 : "Bag",
-        9 : "Ankle boot"  
-    }
-    classes = np.array((class_map.values()))
+    # class_map = {
+    #     0 : "T-shirt/top", 
+    #     1 : "Trouser", 
+    #     2 : "Pullover",
+    #     3 : "Dress", 
+    #     4 : "Coat", 
+    #     5 : "Sandal", 
+    #     6 : "Shirt",
+    #     7 : "Sneaker", 
+    #     8 : "Bag",
+    #     9 : "Ankle boot"  
+    # }
+    # classes = np.array((class_map.values()))
 
     print("Size of Training data:", train_X.shape)
     print("Size of Validation data:", val_X.shape)
-    print('Labels present in fashion mnist dataset: ', ", ".join(class_map.values()))
     
     # scaling data
     scaler = MinMaxScaler() 
@@ -129,7 +128,7 @@ if __name__ == '__main__':
         probs = None, 
         y_true = test_y, 
         preds = pred_y, 
-        class_names = list(class_map.values())
+        class_names = np.unique(test_y)
     )})
 
     # Training 
@@ -139,7 +138,7 @@ if __name__ == '__main__':
         probs = None, 
         y_true = train_y, 
         preds = pred_y, 
-        class_names = list(class_map.values())
+        class_names = np.unique(test_y)
     )})
 
     # Validation 
@@ -149,5 +148,5 @@ if __name__ == '__main__':
         probs = None, 
         y_true = val_y, 
         preds = pred_y, 
-        class_names = list(class_map.values())
+        class_names = np.unique(test_y)
     )})

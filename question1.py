@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__': 
     # ---------------------------- Wandb credentials ----------------------------
-    wandb.init(
-        # project="v1.0",             # Version number for better tracking
-    )
+    # wandb.init(
+    #     # project="v1.0",             # Version number for better tracking
+    # )
 
     # ---------------------------- Question 1 ----------------------------
     [(train_X, train_y), (test_X, test_y)] = keras.datasets.fashion_mnist.load_data()
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     # plt.savefig('test_image.png')
     
     # ---------------------------- Wandb credentials ----------------------------
-    wandb.log({
-        "Question 1": [wandb.Image(img, caption = caption) for img, caption in zip(images, classes)]
-    })
-    wandb.finish()
+    # wandb.log({
+    #     "Question 1": [wandb.Image(img, caption = caption) for img, caption in zip(images, classes)]
+    # })
+    # wandb.finish()
