@@ -138,3 +138,9 @@ MNIST and Fashion MNIST datasets share a lot of common structure:
 - both datasets have images of size (28 $\times$ 28) and they are greyscale. 
 - All of these images are low on resolution 
 - With efficient optimisers, and corrcted batch size, we can get good accuracies. (Reason: MNIST had numerical digits written in a 28 $\times$ 28 canvas and thus the numbers occupy a small space in the canvas, mostly positioned at the center; whereas, fashion_mnist has data which is spread across the $28 \times 28$ canvas)
+
+## Code specifications: 
+
+
+
+Example: python3.9 train.py -d mnist -o adam -a tanh -sz 2048 -nh1 2 -b 2048 -e 5 -lr 0.01 -w_d 0.0005 -w_i he -v True -l cross_entropy -log True -wp da6401_assignment1 -we trial1

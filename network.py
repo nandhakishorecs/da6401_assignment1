@@ -45,39 +45,39 @@ from metrics import *
 
 # optimiser map 
 map_optimiser = {
-    'SGD' : GradientDescent,
-    'Momentum_GD' : MomentumGD, 
-    'Nestorov': NesterovMomentumGD, 
-    'AdaGrad': AdaGrad, 
-    'RMSProp': RMSProp,
-    'AdaDelta': AdaDelta,
-    'Adam': Adam, 
-    'Nadam': Nadam, 
-    'Eve': Eve
+    'sgd' : GradientDescent,
+    'momentum' : MomentumGD, 
+    'nag': NesterovMomentumGD, 
+    'adagrad': AdaGrad, 
+    'rmsprop': RMSProp,
+    'adadelta': AdaDelta,
+    'adam': Adam, 
+    'nadam': Nadam, 
+    'eve': Eve
 }
 
 # loss function map 
 map_loss_function = {
-    'CategoricalCrossEntropy' : CategoricalCrossEntropy(), 
-    'MeanSquaredError' : MeanSquaredError()
+    'cross_entropy' : CategoricalCrossEntropy(), 
+    'mean_squared_error' : MeanSquaredError()
 }
 
 # inictialiser map 
 map_initialiser = {
-    'RandomInit' : RandomInit(), 
-    'Xavier': XavierInit(), 
-    'HeInit': HeInit()
+    'random' : RandomInit(), 
+    'xavier': XavierInit(), 
+    'he': HeInit()
 }
 
 # Encoder 
 encoder = OneHotEncoder()
 
 # Classification metrics calculator 
-# metrics = Metrics()
+metrics = Metrics()
 
 # Basic skeleton 
 class NeuralNetwork: 
-    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, weight_decay: float = 0, name: str = 'My Model') -> None: 
+    def __init__(self, layers: list, batch_size: int, optimiser: str, n_epochs: int, target: np.ndarray, loss_function: str, initialisation: str, learning_rate: float, validation:bool, val_X: np.ndarray = None, val_target: np.ndarray = None, wandb_log: bool = False, weight_decay: float = 0, name: str = 'My Model', momentum: float = 0, epsilon: float = 1e-7, beta: float = 0.9, beta1: float = 0.9, beta2: float = 0.999) -> None: 
         self._name = name
         self._layers = layers
         self._batch_size = batch_size
@@ -92,6 +92,11 @@ class NeuralNetwork:
         self._validation = validation
         self._weight_decay = weight_decay
         self._lr = learning_rate
+        self._momentum = momentum
+        self._epsilon = epsilon
+        self._beta = beta
+        self._beta1 = beta1
+        self._beta2 = beta2
         if(self._validation):
             self._val_X = val_X
             self._layers[0]._a_val = val_X
@@ -104,22 +109,32 @@ class NeuralNetwork:
         for layer in self._layers[1: ]: 
             layer._W_size = (layer._size, size_prev)
             size_prev = layer._size
+
+            if(self._optimiser == 'momentum' or self._optimiser == 'nag'):
+                layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._momentum))
+                layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._momentum))
+            elif(self._optimiser == 'rmsprop' or self._optimiser == 'adadelta'):
+                layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._beta))
+                layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._beta))
+            elif(self._optimiser == 'adam' or self._optimiser == 'nadam' or self._optimiser == 'eve'):
+                layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._beta1, self._beta2, self._epsilon))
+                layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr, self._beta1, self._beta2, self._epsilon))
             
             layer._W_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr))
             layer._b_optimiser = deepcopy(map_optimiser[self._optimiser](self._lr))
 
-        if(self._initialisation == 'RandomInit'):
+        if(self._initialisation == 'random'):
             for layer in self._layers[1: ]: 
                 layer._W = RandomInit().initialize(layer_size = layer._W_size) 
                 # layer._W = np.random.normal(loc = 0, scale = 1, size = layer._W_size)
                 layer._b = np.zeros((layer._W_size[0], 1))
 
-        elif(self._initialisation == 'XavierInit'): 
+        elif(self._initialisation == 'xavier'): 
             for layer in self._layers[1: ]: 
                 layer._W = XavierInit().initialize(layer_size = layer._W_size) 
                 layer._b = np.zeros((layer._W_size[0], 1))
 
-        elif(self._initialisation == 'HeInit'): 
+        elif(self._initialisation == 'he'): 
             for layer in self._layers[1: ]: 
                 layer._W = HeInit().initialize(layer_size = layer._W_size) 
                 layer._b = np.zeros((layer._W_size[0], 1))
@@ -153,7 +168,7 @@ class NeuralNetwork:
                 self._layers[i]._h_val = self._layers[i]._W @ self._layers[i-1]._a_val - self._layers[i]._b
                 self._layers[i]._a_val = self._layers[i]._activation.value(self._layers[i]._h_val)
         
-        if(self._loss_type == 'CategoricalCrossEntropy'):
+        if(self._loss_type == 'cross_entropy'):
             self._layers[-1]._y = Softmax().value(self._layers[-1]._a)
             if(self._validation):
                 self._layers[-1]._y_val = Softmax().value(self._layers[-1]._a_val)
@@ -272,7 +287,7 @@ class NeuralNetwork:
     def _get_accuracy(self):    # Returns tuple when validation, else returns a single float 
         train_t = encoder.inverse_transform(self._target)
         train_y = encoder.inverse_transform(self._layers[-1]._y)
-        
+
         from sklearn import metrics
         training_accuracy = metrics.accuracy_score(train_t, train_y)
         
@@ -292,7 +307,7 @@ class NeuralNetwork:
             h = self._layers[i]._W @ a - self._layers[i]._b
             a = self._layers[i]._activation.value(h)
 
-        if(self._loss_type == 'CategoricalCrossEntropy'): 
+        if(self._loss_type == 'cross_entropy'): 
             pred_y = Softmax().value(a)
         else: 
             pred_y = a
@@ -318,7 +333,7 @@ class NeuralNetwork:
             self._layers[i]._h_test = self._layers[i]._W @ self._layers[i-1]._a_test - self._layers[i]._b
             self._layers[i]._a_test = self._layers[i]._activation.value(self._layers[i]._h_test)
         
-        if(self._loss_type == 'CategoricalCrossEntropy'):
+        if(self._loss_type == 'cross_entropy'):
             self._layers[-1]._y_test = Softmax().value(self._layers[-1]._a_test)
         else: 
             self._layers[-1]._y_test = self._layers[-1]._a_test

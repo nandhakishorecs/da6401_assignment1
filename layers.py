@@ -18,11 +18,11 @@ from initialisers import *
 # ----------------------------------------------------------------------------------------------------------------------------
 
 activation_functions_map = {
-    'Sigmoid': Sigmoid(), 
-    'Tanh': Tanh(), 
-    'ReLU': ReLU(),
-    'Softmax': Softmax(),
-    'Identity': Identity()
+    'sigmoid': Sigmoid(), 
+    'tanh': Tanh(), 
+    'relu': ReLU(),
+    'softmax': Softmax(),
+    'identity': Identity()
 }
 
 # We have K layers - Kth layer is output, 1st layer is Input and we have L-1 Hidden layers 
@@ -40,7 +40,7 @@ class Input:
 # Dense Layer 
 class Dense:
     __slots__ = '_name', '_activation', '_size', '_W', '_W_size', '_W_optimiser', '_W_grad', '_W_update', '_b', '_b_optimiser', '_b_grad', '_b_update','_h', '_h_val', '_h_grad', '_h_test', '_a', '_a_grad', '_a_val', '_a_test','_y', '_y_val', '_y_test'
-    def __init__(self, name: str, layer_size: int, activation: str = 'ReLU') -> None:
+    def __init__(self, name: str, layer_size: int, activation: str = 'relu') -> None:
         self._name = name
         self._activation = activation_functions_map[activation]
         self._size = layer_size
