@@ -87,12 +87,15 @@ Refer the wandb report for plots.
 
 ## Question 7
 
-Refer wandb report for the confusion matrix
+Refer wandb report for the confusion matrix. 
+Code can be accessed [here](https://github.com/nandhakishorecs/DA6401_IDL_Assignments/blob/main/Assignment_1/question7.py). 
 
 ## Question 8
 When categorical cross entropy loss is replaced by mean squared error loss, the accuracy drops drastically and leads to zero. The follwing points might be the reason why ths behavior is observed. 
 - In categorical cross entropy, the loss is calculates as the difference between two probability distributions. Thus the error value is more relevelant it is incorporating the nature of the probability that, sum of the distribution is one and all the values in the probability distribution (predicted & true output ) are positive and between zero and 1 
 - In Mean Squared Error (MSE), the difference between the predicted and actual error is measured in terms of euclidian distance, which ignore the properties of the probaiblity distribuions which are the output. This leads to the fact that, for classification task, MSE is not a good choice and it is sensitive to distances. 
+
+Refer wandb report for detailed plots. 
 
 ## Question 9
 This repository contains the complete code for Assignment 1 in prescribed format. 
