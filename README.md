@@ -115,19 +115,19 @@ The details about command line arguements can be found below: <br>
 | `-e`, `--epochs` | 1 |  Number of epochs to train neural network.|
 | `-bs`, `--batch_size` | 4 | Batch size used to train neural network. | 
 | `-l`, `--loss` | cross_entropy | choices:  ["mean_squared_error", "cross_entropy"] |
-| `-o`, `--optimizer` | sgd | choices:  ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"] | 
+| `-o`, `--optimizer` | sgd | choices:  ["sgd", "momentum", "nag", "adagrad", "rmsprop", "adadelta", "adam", "nadam"] | 
 | `-lr`, `--learning_rate` | 0.1 | Learning rate used to optimize model parameters | 
 | `-w_d`, `--weight_decay` | 0 | Weight decay used by optimizers. |
-| `-w_i`, `--initialisation` | random | choices:  ["random", "Xavier"] | 
+| `-w_i`, `--initialisation` | random | choices:  ["random", "xavier", "he"] | 
 | `-nhl`, `--hidden_layers` | 1 | Number of hidden layers used in feedforward neural network. | 
 | `-sz`, `--hidden_size` | 4 | Number of hidden neurons in a feedforward layer. |
-| `-a`, `--activation` | sigmoid | choices:  ["identity", "sigmoid", "tanh", "ReLU"] |
+| `-a`, `--activation` | sigmoid | choices:  ["identity", "sigmoid", "tanh", "relu"] |
 | `-v`, `--validation` | True | choices: [True, False] | 
 | `-m`, `--momentum` | 0.5 | Momentum for Momentum and NAG optimisers | 
 | `-b`, `--beta` | 0.5 | Beta for RMSProp and AdaDelta optimisers | 
 | `-b1`, `--beta1` | 0.5 | Beta1 for Adam, Eve, Nadam optimisers | 
 | `-b2`, `--beta2` | 0.5 | Beta2 for Adam, Eve, Nadam optimisers | 
-| `-eps`, `--epsilon` | 0.0000001 | Epsilon for Optimisers | 
+| `-eps`, `--epsilon` | 0.0000001 | Epsilon for Optimisers except SGD, Momentum and NAG| 
 
 ## Question 10
 For MNIST dataset, the folowing three configurations were tried and the details are as follows: 
